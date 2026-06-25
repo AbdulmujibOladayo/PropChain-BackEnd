@@ -238,6 +238,7 @@ model User {
   propertyViews           PropertyView[]
     openHouseRsvps             OpenHouseRsvp[]
   transactionNotes        TransactionNote[]            @relation("TransactionNoteAuthor")
+  deletedProperties       Property[]               @relation("DeletedProperties")
 
   @@index([email])
   @@index([role])

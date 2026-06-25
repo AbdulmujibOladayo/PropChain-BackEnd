@@ -106,8 +106,8 @@ export class PropertiesService {
   async findAll(params?: FindAllParams) {
     const { skip, take, where, orderBy } = params || {};
     const finalWhere = where
-      ? { ...where, status: where.status ?? PropertyStatus.ACTIVE }
-      : { status: PropertyStatus.ACTIVE };
+      ? { ...where, status: where.status ?? PropertyStatus.ACTIVE, deleted: false }
+      : { status: PropertyStatus.ACTIVE, deleted: false };
 
     return (this.prisma.property as any).findMany({
       skip,
@@ -499,7 +499,9 @@ export class PropertiesService {
    * Exposed as private and used only by `searchProperties`.
    */
   private buildSearchWhereClause(dto: SearchPropertiesDto): Record<string, unknown> {
-    const where: Record<string, unknown> = {};
+    const where: Record<string, unknown> = {
+      deleted: false,
+    };
 
     // Price range
     if (dto.minPrice !== undefined || dto.maxPrice !== undefined) {

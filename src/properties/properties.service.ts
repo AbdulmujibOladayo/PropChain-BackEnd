@@ -256,12 +256,32 @@ export class PropertiesService {
      });
   }
 
-  async remove(id: string) {
-    const deleted = await this.prisma.property.delete({
+  async remove(id: string, user: AuthUserPayload) {
+    const property = await this.prisma.property.findUnique({
       where: { id },
     });
+
+    if (!property) {
+      throw new NotFoundException(`Property with ID ${id} not found`);
+    }
+
+    // Authorization check: only property owner or admin can delete
+    if (property.ownerId !== user.sub && user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('You are not authorized to delete this property');
+    }
+
+    const updated = await this.prisma.property.update({
+      where: { id },
+      data: {
+        deleted: true,
+        deletedAt: new Date(),
+        deletedById: user.sub,
+        status: PropertyStatus.ARCHIVED,
+      },
+    });
+
     await this.cacheService.invalidateByTag(CACHE_TAGS.PROPERTIES);
-    return deleted;
+    return updated;
   }
 
    async findByOwnerId(ownerId: string) {

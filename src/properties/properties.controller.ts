@@ -79,8 +79,15 @@ export class PropertiesController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.propertiesService.remove(id);
+  remove(@Param('id') id: string, @CurrentUser() user: AuthUserPayload) {
+    return this.propertiesService.remove(id, user);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Patch(':id/restore')
+  restore(@Param('id') id: string, @CurrentUser() user: AuthUserPayload) {
+    return this.propertiesService.restore(id, user);
   }
 
   @UseGuards(JwtAuthGuard)

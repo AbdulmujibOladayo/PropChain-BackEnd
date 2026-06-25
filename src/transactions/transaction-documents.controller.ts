@@ -22,8 +22,8 @@ export class TransactionDocumentsController {
 
   /** GET /transactions/:transactionId/documents — list documents */
   @Get()
-  list(@Param('transactionId') transactionId: string) {
-    return this.service.list(transactionId);
+  list(@Param('transactionId') transactionId: string, @CurrentUser() user: AuthUserPayload) {
+    return this.service.list(transactionId, user.sub, user.role);
   }
 
   /** GET /transactions/:transactionId/documents/:documentId — view a document */
@@ -51,8 +51,9 @@ export class TransactionDocumentsController {
   getVersions(
     @Param('transactionId') transactionId: string,
     @Param('documentId') documentId: string,
+    @CurrentUser() user: AuthUserPayload,
   ) {
-    return this.service.getVersions(transactionId, documentId);
+    return this.service.getVersions(transactionId, documentId, user.sub, user.role);
   }
 
   /** POST /transactions/:transactionId/documents/:documentId/versions — add a new version */
@@ -63,6 +64,6 @@ export class TransactionDocumentsController {
     @Body() dto: AddVersionDto,
     @CurrentUser() user: AuthUserPayload,
   ) {
-    return this.service.addVersion(transactionId, documentId, dto, user.sub);
+    return this.service.addVersion(transactionId, documentId, dto, user.sub, user.role);
   }
 }

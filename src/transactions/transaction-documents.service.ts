@@ -44,9 +44,9 @@ export class TransactionDocumentsService {
   }
 
   /** List all documents attached to a transaction. */
-  async list(transactionId: string, userId?: string, userRole?: string) {
+  async list(transactionId: string, userId: string, userRole: string) {
     const tx = await this.ensureTransactionExists(transactionId);
-    if (userId) this.assertAccess(tx, userId, userRole);
+    this.assertAccess(tx, userId, userRole);
     return this.prisma.document.findMany({
       where: { transactionId },
       orderBy: { createdAt: 'desc' },
@@ -68,8 +68,17 @@ export class TransactionDocumentsService {
   }
 
   /** Add a new version to an existing transaction document. */
-  async addVersion(transactionId: string, documentId: string, dto: AddVersionDto, userId: string) {
-    const doc = await this.findOne(transactionId, documentId);
+  async addVersion(
+    transactionId: string,
+    documentId: string,
+    dto: AddVersionDto,
+    userId: string,
+    userRole: string,
+  ) {
+    const tx = await this.ensureTransactionExists(transactionId);
+    this.assertAccess(tx, userId, userRole);
+
+    const doc = await this.findOne(transactionId, documentId, userId, userRole);
 
     const nextVersion = (doc.versions?.length ?? 0) + 1;
 
@@ -96,8 +105,11 @@ export class TransactionDocumentsService {
   }
 
   /** List all versions of a document. */
-  async getVersions(transactionId: string, documentId: string) {
-    await this.findOne(transactionId, documentId);
+  async getVersions(transactionId: string, documentId: string, userId: string, userRole: string) {
+    const tx = await this.ensureTransactionExists(transactionId);
+    this.assertAccess(tx, userId, userRole);
+
+    await this.findOne(transactionId, documentId, userId, userRole);
     return this.prisma.documentVersion.findMany({
       where: { documentId },
       orderBy: { versionNumber: 'asc' },

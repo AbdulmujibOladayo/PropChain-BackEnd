@@ -108,8 +108,11 @@ export class TransactionDocumentsService {
   }
 
   /** Remove a document from a transaction. */
-  async remove(transactionId: string, documentId: string) {
-    await this.findOne(transactionId, documentId);
+  async remove(transactionId: string, documentId: string, userId: string, userRole: string) {
+    const tx = await this.ensureTransactionExists(transactionId);
+    this.assertAccess(tx, userId, userRole);
+
+    await this.findOne(transactionId, documentId, userId, userRole);
     return this.prisma.document.delete({ where: { id: documentId } });
   }
 

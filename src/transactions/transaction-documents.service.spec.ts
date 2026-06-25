@@ -99,7 +99,18 @@ describe('TransactionDocumentsService', () => {
     it('throws NotFoundException when document not in transaction', async () => {
       mockPrisma.transaction.findUnique.mockResolvedValue({ id: 'tx-1' });
       mockPrisma.document.findFirst.mockResolvedValue(null);
-      await expect(service.findOne('tx-1', 'bad-doc')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('tx-1', 'bad-doc', 'user-1', 'USER')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+
+  describe('access control', () => {
+    const tx = { id: 'tx-1', buyerId: 'buyer-1', sellerId: 'seller-1' };
+
+    it('should deny access to unrelated user', async () => {
+      mockPrisma.transaction.findUnique.mockResolvedValue(tx);
+      await expect(service.list('tx-1', 'other-user', 'USER')).rejects.toThrow(ForbiddenException);
     });
   });
 });

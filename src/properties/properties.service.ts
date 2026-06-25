@@ -106,8 +106,8 @@ export class PropertiesService {
   async findAll(params?: FindAllParams) {
     const { skip, take, where, orderBy } = params || {};
     const finalWhere = where
-      ? { ...where, status: where.status ?? PropertyStatus.ACTIVE }
-      : { status: PropertyStatus.ACTIVE };
+      ? { ...where, status: where.status ?? PropertyStatus.ACTIVE, deleted: false }
+      : { status: PropertyStatus.ACTIVE, deleted: false };
 
     return (this.prisma.property as any).findMany({
       skip,
@@ -256,12 +256,60 @@ export class PropertiesService {
      });
   }
 
-  async remove(id: string) {
-    const deleted = await this.prisma.property.delete({
+  async remove(id: string, user: AuthUserPayload) {
+    const property = await this.prisma.property.findUnique({
       where: { id },
     });
+
+    if (!property) {
+      throw new NotFoundException(`Property with ID ${id} not found`);
+    }
+
+    // Authorization check: only property owner or admin can delete
+    if (property.ownerId !== user.sub && user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('You are not authorized to delete this property');
+    }
+
+    const updated = await this.prisma.property.update({
+      where: { id },
+      data: {
+        deleted: true,
+        deletedAt: new Date(),
+        deletedById: user.sub,
+        status: PropertyStatus.ARCHIVED,
+      },
+    });
+
     await this.cacheService.invalidateByTag(CACHE_TAGS.PROPERTIES);
-    return deleted;
+    return updated;
+  }
+
+  async restore(id: string, user: AuthUserPayload) {
+    const property = await this.prisma.property.findUnique({
+      where: { id },
+    });
+
+    if (!property) {
+      throw new NotFoundException(`Property with ID ${id} not found`);
+    }
+
+    // Authorization check: only admin can restore
+    if (user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('You are not authorized to restore this property');
+    }
+
+    const updated = await this.prisma.property.update({
+      where: { id },
+      data: {
+        deleted: false,
+        deletedAt: null,
+        deletedById: null,
+        status: PropertyStatus.DRAFT, // Or the original status before deletion
+      },
+    });
+
+    await this.cacheService.invalidateByTag(CACHE_TAGS.PROPERTIES);
+    return updated;
   }
 
    async findByOwnerId(ownerId: string) {
@@ -451,7 +499,9 @@ export class PropertiesService {
    * Exposed as private and used only by `searchProperties`.
    */
   private buildSearchWhereClause(dto: SearchPropertiesDto): Record<string, unknown> {
-    const where: Record<string, unknown> = {};
+    const where: Record<string, unknown> = {
+      deleted: false,
+    };
 
     // Price range
     if (dto.minPrice !== undefined || dto.maxPrice !== undefined) {

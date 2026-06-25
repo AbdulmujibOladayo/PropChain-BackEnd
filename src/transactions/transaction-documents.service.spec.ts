@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { TransactionDocumentsService } from './transaction-documents.service';
 
 const mockDoc = {
@@ -99,7 +99,38 @@ describe('TransactionDocumentsService', () => {
     it('throws NotFoundException when document not in transaction', async () => {
       mockPrisma.transaction.findUnique.mockResolvedValue({ id: 'tx-1' });
       mockPrisma.document.findFirst.mockResolvedValue(null);
-      await expect(service.findOne('tx-1', 'bad-doc')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('tx-1', 'bad-doc', 'user-1', 'USER')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+
+  describe('access control', () => {
+    const tx = { id: 'tx-1', buyerId: 'buyer-1', sellerId: 'seller-1' };
+
+    it('should deny access to unrelated user', async () => {
+      mockPrisma.transaction.findUnique.mockResolvedValue(tx);
+      await expect(service.list('tx-1', 'other-user', 'USER')).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should allow access to buyer', async () => {
+      mockPrisma.transaction.findUnique.mockResolvedValue(tx);
+      await expect(service.list('tx-1', 'buyer-1', 'USER')).resolves.not.toThrow();
+    });
+
+    it('should allow access to seller', async () => {
+      mockPrisma.transaction.findUnique.mockResolvedValue(tx);
+      await expect(service.list('tx-1', 'seller-1', 'USER')).resolves.not.toThrow();
+    });
+
+    it('should allow access to admin', async () => {
+      mockPrisma.transaction.findUnique.mockResolvedValue(tx);
+      await expect(service.list('tx-1', 'admin-1', 'ADMIN')).resolves.not.toThrow();
+    });
+
+    it('should allow access to agent', async () => {
+      mockPrisma.transaction.findUnique.mockResolvedValue(tx);
+      await expect(service.list('tx-1', 'agent-1', 'AGENT')).resolves.not.toThrow();
     });
   });
 });

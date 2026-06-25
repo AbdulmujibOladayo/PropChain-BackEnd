@@ -249,6 +249,50 @@ describe('PropertiesService', () => {
     });
   });
 
+  describe('soft delete and restore', () => {
+    const adminUser = { sub: 'admin-1', role: UserRole.ADMIN };
+    const propertyOwner = { sub: 'user-123', role: UserRole.USER };
+
+    it('should soft delete a property', async () => {
+      const result = await service.remove(mockProperty.id, propertyOwner);
+
+      expect(prisma.property.update).toHaveBeenCalledWith({
+        where: { id: mockProperty.id },
+        data: {
+          deleted: true,
+          deletedAt: expect.any(Date),
+          deletedById: propertyOwner.sub,
+          status: PropertyStatus.ARCHIVED,
+        },
+      });
+      expect(result).toBe(mockProperty);
+    });
+
+    it('should restore a soft-deleted property', async () => {
+      const deletedProperty = { ...mockProperty, deleted: true, deletedAt: new Date() };
+      mockPrismaService.property.findUnique.mockResolvedValue(deletedProperty);
+
+      const result = await service.restore(mockProperty.id, adminUser);
+
+      expect(prisma.property.update).toHaveBeenCalledWith({
+        where: { id: mockProperty.id },
+        data: {
+          deleted: false,
+          deletedAt: null,
+          deletedById: null,
+          status: PropertyStatus.DRAFT,
+        },
+      });
+      expect(result).toBe(mockProperty);
+    });
+
+    it('should not allow a non-admin to restore a property', async () => {
+      await expect(service.restore(mockProperty.id, propertyOwner)).rejects.toThrow(
+        ForbiddenException,
+      );
+    });
+  });
+
   describe('bulkUpdatePropertyStatus', () => {
     it('should call updateMany with property ids and status', async () => {
       mockPrismaService.property.updateMany.mockResolvedValue({ count: 3 });

@@ -284,6 +284,34 @@ export class PropertiesService {
     return updated;
   }
 
+  async restore(id: string, user: AuthUserPayload) {
+    const property = await this.prisma.property.findUnique({
+      where: { id },
+    });
+
+    if (!property) {
+      throw new NotFoundException(`Property with ID ${id} not found`);
+    }
+
+    // Authorization check: only admin can restore
+    if (user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('You are not authorized to restore this property');
+    }
+
+    const updated = await this.prisma.property.update({
+      where: { id },
+      data: {
+        deleted: false,
+        deletedAt: null,
+        deletedById: null,
+        status: PropertyStatus.DRAFT, // Or the original status before deletion
+      },
+    });
+
+    await this.cacheService.invalidateByTag(CACHE_TAGS.PROPERTIES);
+    return updated;
+  }
+
    async findByOwnerId(ownerId: string) {
      return this.prisma.property.findMany({
        where: { ownerId },

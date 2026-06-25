@@ -55,7 +55,10 @@ export class TransactionDocumentsService {
   }
 
   /** Get a single document (must belong to the transaction). */
-  async findOne(transactionId: string, documentId: string) {
+  async findOne(transactionId: string, documentId: string, userId: string, userRole: string) {
+    const tx = await this.ensureTransactionExists(transactionId);
+    this.assertAccess(tx, userId, userRole);
+
     const doc = await this.prisma.document.findFirst({
       where: { id: documentId, transactionId },
       include: { versions: { orderBy: { versionNumber: 'asc' } } },

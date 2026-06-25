@@ -28,8 +28,12 @@ export class TransactionDocumentsController {
 
   /** GET /transactions/:transactionId/documents/:documentId — view a document */
   @Get(':documentId')
-  findOne(@Param('transactionId') transactionId: string, @Param('documentId') documentId: string) {
-    return this.service.findOne(transactionId, documentId);
+  findOne(
+    @Param('transactionId') transactionId: string,
+    @Param('documentId') documentId: string,
+    @CurrentUser() user: AuthUserPayload,
+  ) {
+    return this.service.findOne(transactionId, documentId, user.sub, user.role);
   }
 
   /** DELETE /transactions/:transactionId/documents/:documentId — remove a document */

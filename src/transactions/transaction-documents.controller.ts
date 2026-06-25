@@ -38,8 +38,12 @@ export class TransactionDocumentsController {
 
   /** DELETE /transactions/:transactionId/documents/:documentId — remove a document */
   @Delete(':documentId')
-  remove(@Param('transactionId') transactionId: string, @Param('documentId') documentId: string) {
-    return this.service.remove(transactionId, documentId);
+  remove(
+    @Param('transactionId') transactionId: string,
+    @Param('documentId') documentId: string,
+    @CurrentUser() user: AuthUserPayload,
+  ) {
+    return this.service.remove(transactionId, documentId, user.sub, user.role);
   }
 
   /** GET /transactions/:transactionId/documents/:documentId/versions — version history */

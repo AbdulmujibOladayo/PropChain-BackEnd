@@ -240,7 +240,6 @@ model User {
   deletedProperties       Property[]               @relation("DeletedProperties")
 
   @@index([email])
-  @@index([role])
   @@index([isDeactivated])
   @@index([scheduledDeletionAt])
   @@index([referralCode])
@@ -632,8 +631,6 @@ model Transaction {
   transactionMilestones TransactionMilestone[]
   transactionHistory    TransactionHistory[]
   transactionNotes      TransactionNote[]
-  cancelledBy           User?    @relation("CancelledTransactions", fields: [cancelledById], references: [id])
-
   @@index([propertyId])
   @@index([buyerId])
   @@index([sellerId])
@@ -1290,6 +1287,18 @@ model ExportJob {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
 
-  @@index([type, status])
   @@map("export_jobs")
+}
+
+enum JobType {
+  EXPORT
+  IMPORT
+  REPORT
+}
+
+enum JobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
 }

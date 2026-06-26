@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import {
   Injectable,
   Logger,
@@ -6,9 +5,6 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-=======
-import { Injectable, Logger, OnModuleInit, NotFoundException, BadRequestException } from '@nestjs/common';
->>>>>>> 1076b76 (feat: phone validation, avatar upload, session invalidation, address geocoding validation)
 import { PrismaService } from '../database/prisma.service';
 import { CreateUserDto, SearchUsersDto, UpdatePreferencesDto, UpdateUserDto } from './dto/user.dto';
 import { DeactivateAccountDto, ReactivateAccountDto } from './dto/deactivation.dto';
@@ -22,7 +18,6 @@ import { SessionsService } from '../sessions/sessions.service';
 @Injectable()
 export class UsersService implements OnModuleInit {
   async getProfile(userId: string): Promise<ProfileResponseDto> {
-<<<<<<< HEAD
     const user = await this.prisma.user.findUnique({
       where: { id: userId, isDeactivated: false },
       include: {
@@ -37,75 +32,6 @@ export class UsersService implements OnModuleInit {
           },
         },
       },
-=======
-  const user = await this.prisma.user.findUnique({
-    where: { id: userId, isDeactivated: false },
-    include: {
-      properties: { select: { id: true } },
-      buyerTransactions: { select: { id: true } },
-      sellerTransactions: { select: { id: true } },
-      _count: {
-        select: {
-          properties: true,
-          buyerTransactions: true,
-          sellerTransactions: true,
-        },
-      },
-    },
-  });
-
-  if (!user) {
-    throw new NotFoundException('User profile not found');
-  }
-
-  const now = new Date();
-  const createdAt = new Date(user.createdAt);
-  const accountAgeDays = Math.floor(
-    (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24),
-  );
-
-  return {
-    id: user.id,
-    email: user.email,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    fullName: `${user.firstName} ${user.lastName}`,
-    phone: user.phone,
-    avatar: user.avatar,
-    bio: user.bio || null, // if bio field exists in schema, otherwise omit
-    role: user.role,
-    isVerified: user.isVerified,
-    preferredChannel: user.preferredChannel,
-    languagePreference: user.languagePreference,
-    timezone: user.timezone,
-    contactHours: user.contactHours as { start: string; end: string } | null,
-    address: user.address as any || null, // if address field exists
-    occupation: user.occupation || null,
-    company: user.company || null,
-    referralCode: user.referralCode,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
-    lastActivityAt: user.lastActivityAt,
-    statistics: {
-      propertiesCount: user._count.properties,
-      transactionsCount: user._count.buyerTransactions + user._count.sellerTransactions,
-      accountAgeDays,
-    },
-  };
-}
-
-async updateProfile(
-  userId: string,
-  data: UpdateProfileDto,
-): Promise<ProfileResponseDto> {
-  // Check if email is being changed and if it's already taken
-  if (data.email) {
-    const existingUser = await this.prisma.user.findFirst({
-      where: {
-        email: data.email,
-        NOT: { id: userId },
-      },
->>>>>>> 1076b76 (feat: phone validation, avatar upload, session invalidation, address geocoding validation)
     });
 
     if (!user) {

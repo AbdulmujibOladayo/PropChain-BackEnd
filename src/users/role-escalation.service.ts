@@ -1,32 +1,12 @@
-async requestEscalation(
-  userId: string,
-  dto: RequestRoleEscalationDto,
-) {
-  const request =
-    this.repository.create({
-      userId,
-      currentRole: user.role,
-      requestedRole:
-        dto.requestedRole,
-    });
+import { Injectable } from '@nestjs/common';
+import { RequestRoleEscalationDto } from './dto/request-role-escalation.dto';
 
-  const saved =
-    await this.repository.save(
-      request,
-    );
-
-  await this.auditService.log({
-    action:
-      'ROLE_ESCALATION_REQUESTED',
-    userId,
-    resourceId: saved.id,
-    metadata: {
-      currentRole:
-        user.role,
-      requestedRole:
-        dto.requestedRole,
-    },
-  });
-
-  return saved;
+@Injectable()
+export class RoleEscalationService {
+  async requestEscalation(
+    _userId: string,
+    _dto: RequestRoleEscalationDto,
+  ): Promise<void> {
+    // TODO: implement role escalation workflow
+  }
 }

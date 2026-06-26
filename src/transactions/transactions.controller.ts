@@ -303,6 +303,8 @@ export class TransactionsController {
     return this.transactionRemindersService.sendDeadlineReminders(
       daysAhead ? parseInt(daysAhead, 10) : 3,
     );
+  }
+
   @Patch(':id/escrow')
   @ApiOperation({ summary: 'Update escrow and payment status (#561)' })
   async updateEscrow(

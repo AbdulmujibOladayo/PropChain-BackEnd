@@ -25,7 +25,12 @@ export const DEFAULT_PROPERTY_STATUS = PropertyStatus.PENDING;
  */
 const ALLOWED_PROPERTY_STATUS_TRANSITIONS: Record<PropertyStatus, readonly PropertyStatus[]> = {
   [PropertyStatus.DRAFT]: [PropertyStatus.PENDING, PropertyStatus.ARCHIVED, PropertyStatus.EXPIRED],
-  [PropertyStatus.PENDING]: [PropertyStatus.ACTIVE, PropertyStatus.DRAFT, PropertyStatus.ARCHIVED, PropertyStatus.EXPIRED],
+  [PropertyStatus.PENDING]: [
+    PropertyStatus.ACTIVE,
+    PropertyStatus.DRAFT,
+    PropertyStatus.ARCHIVED,
+    PropertyStatus.EXPIRED,
+  ],
   [PropertyStatus.ACTIVE]: [
     PropertyStatus.UNDER_CONTRACT,
     PropertyStatus.RENTED,

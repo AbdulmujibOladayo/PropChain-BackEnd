@@ -21,24 +21,35 @@ class FakePrismaService {
   user = {
     create: async ({ data }: any) => {
       const id = data.id ?? Math.random().toString(36).slice(2, 10);
-      const record = { id, ...data, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+      const record = {
+        id,
+        ...data,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
       this.users.set(id, record);
       return record;
     },
     findUnique: async ({ where }: any) => {
       if (where?.id) return this.users.get(where.id) ?? null;
-      if (where?.email) return Array.from(this.users.values()).find((u) => u.email === where.email) ?? null;
-      if (where?.referralCode) return Array.from(this.users.values()).find((u) => u.referralCode === where.referralCode) ?? null;
+      if (where?.email)
+        return Array.from(this.users.values()).find((u) => u.email === where.email) ?? null;
+      if (where?.referralCode)
+        return (
+          Array.from(this.users.values()).find((u) => u.referralCode === where.referralCode) ?? null
+        );
       return null;
     },
     findFirst: async ({ where }: any) => {
       if (!where) return null;
-      return Array.from(this.users.values()).find((u) => {
-        for (const k of Object.keys(where)) {
-          if (u[k] !== where[k]) return false;
-        }
-        return true;
-      }) ?? null;
+      return (
+        Array.from(this.users.values()).find((u) => {
+          for (const k of Object.keys(where)) {
+            if (u[k] !== where[k]) return false;
+          }
+          return true;
+        }) ?? null
+      );
     },
     update: async ({ where, data }: any) => {
       const user = this.users.get(where.id);
@@ -74,12 +85,14 @@ class FakePrismaService {
       return p;
     },
     findFirst: async ({ where }: any) => {
-      return Array.from(this.properties.values()).find((prop) => {
-        for (const key of Object.keys(where)) {
-          if (where[key] !== prop[key]) return false;
-        }
-        return true;
-      }) ?? null;
+      return (
+        Array.from(this.properties.values()).find((prop) => {
+          for (const key of Object.keys(where)) {
+            if (where[key] !== prop[key]) return false;
+          }
+          return true;
+        }) ?? null
+      );
     },
     findMany: async ({ where, skip = 0, take = 100 }: any) => {
       const items = Array.from(this.properties.values()).filter((p) => {

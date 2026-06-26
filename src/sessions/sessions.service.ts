@@ -118,24 +118,26 @@ export class SessionsService {
       },
     });
 
-    const blacklistedTokens = sessions.flatMap((session: any) => [
-      session.accessTokenJti
-        ? {
-            jti: session.accessTokenJti,
-            tokenType: 'ACCESS' as const,
-            expiresAt: session.expiresAt,
-            userId,
-          }
-        : null,
-      session.refreshTokenJti
-        ? {
-            jti: session.refreshTokenJti,
-            tokenType: 'REFRESH' as const,
-            expiresAt: session.expiresAt,
-            userId,
-          }
-        : null,
-    ]).filter(Boolean);
+    const blacklistedTokens = sessions
+      .flatMap((session: any) => [
+        session.accessTokenJti
+          ? {
+              jti: session.accessTokenJti,
+              tokenType: 'ACCESS' as const,
+              expiresAt: session.expiresAt,
+              userId,
+            }
+          : null,
+        session.refreshTokenJti
+          ? {
+              jti: session.refreshTokenJti,
+              tokenType: 'REFRESH' as const,
+              expiresAt: session.expiresAt,
+              userId,
+            }
+          : null,
+      ])
+      .filter(Boolean);
 
     if (blacklistedTokens.length > 0) {
       await this.prisma.blacklistedToken.createMany({

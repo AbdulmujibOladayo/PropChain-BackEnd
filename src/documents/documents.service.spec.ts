@@ -22,10 +22,7 @@ describe('DocumentsService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        DocumentsService,
-        { provide: PrismaService, useValue: mockPrismaService },
-      ],
+      providers: [DocumentsService, { provide: PrismaService, useValue: mockPrismaService }],
     }).compile();
 
     service = module.get<DocumentsService>(DocumentsService);
@@ -51,17 +48,17 @@ describe('DocumentsService', () => {
       const doc = { id: 'doc-1', userId: 'user-2', fileName: 'test.pdf' };
       mockPrismaService.document.findUnique.mockResolvedValue(doc);
 
-      await expect(
-        service.findAuthorizedById('doc-1', 'user-1'),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.findAuthorizedById('doc-1', 'user-1')).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
     it('should throw NotFoundException when document does not exist', async () => {
       mockPrismaService.document.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.findAuthorizedById('doc-999', 'user-1'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.findAuthorizedById('doc-999', 'user-1')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -150,8 +147,24 @@ describe('DocumentsService', () => {
 
     it('should throw ForbiddenException when user does not own one of the documents', async () => {
       const docs = [
-        { id: 'doc-1', userId: 'user-1', fileName: 'a.pdf', documentType: 'CONTRACT', fileUrl: 'http://example.com/a.pdf', fileSize: 100, mimeType: 'application/pdf' },
-        { id: 'doc-2', userId: 'user-2', fileName: 'b.pdf', documentType: 'CONTRACT', fileUrl: 'http://example.com/b.pdf', fileSize: 200, mimeType: 'application/pdf' },
+        {
+          id: 'doc-1',
+          userId: 'user-1',
+          fileName: 'a.pdf',
+          documentType: 'CONTRACT',
+          fileUrl: 'http://example.com/a.pdf',
+          fileSize: 100,
+          mimeType: 'application/pdf',
+        },
+        {
+          id: 'doc-2',
+          userId: 'user-2',
+          fileName: 'b.pdf',
+          documentType: 'CONTRACT',
+          fileUrl: 'http://example.com/b.pdf',
+          fileSize: 200,
+          mimeType: 'application/pdf',
+        },
       ];
       mockPrismaService.document.findMany.mockResolvedValue(docs);
 
@@ -162,7 +175,15 @@ describe('DocumentsService', () => {
 
     it('should proceed without authorization check when userId is not provided', async () => {
       const docs = [
-        { id: 'doc-1', userId: 'user-1', fileName: 'a.pdf', documentType: 'CONTRACT', fileUrl: 'http://example.com/a.pdf', fileSize: 100, mimeType: 'application/pdf' },
+        {
+          id: 'doc-1',
+          userId: 'user-1',
+          fileName: 'a.pdf',
+          documentType: 'CONTRACT',
+          fileUrl: 'http://example.com/a.pdf',
+          fileSize: 100,
+          mimeType: 'application/pdf',
+        },
       ];
       mockPrismaService.document.findMany.mockResolvedValue(docs);
 
@@ -172,11 +193,23 @@ describe('DocumentsService', () => {
 
     it('should authorize user when userId is provided and matches', async () => {
       const docs = [
-        { id: 'doc-1', userId: 'user-1', fileName: 'a.pdf', documentType: 'CONTRACT', fileUrl: 'http://example.com/a.pdf', fileSize: 100, mimeType: 'application/pdf' },
+        {
+          id: 'doc-1',
+          userId: 'user-1',
+          fileName: 'a.pdf',
+          documentType: 'CONTRACT',
+          fileUrl: 'http://example.com/a.pdf',
+          fileSize: 100,
+          mimeType: 'application/pdf',
+        },
       ];
       mockPrismaService.document.findMany.mockResolvedValue(docs);
 
-      const result = await service.bulkDownload({ documentIds: ['doc-1'] }, mockStreamRes(), 'user-1');
+      const result = await service.bulkDownload(
+        { documentIds: ['doc-1'] },
+        mockStreamRes(),
+        'user-1',
+      );
       expect(result.count).toBe(1);
     });
   });

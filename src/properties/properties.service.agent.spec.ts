@@ -4,6 +4,8 @@ import { PrismaService } from '../database/prisma.service';
 import { FraudService } from '../fraud/fraud.service';
 import { ForbiddenException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Decimal } from '@prisma/client/runtime/library';
+import { GeocodingService } from './geocoding.service';
+import { CacheService } from '../cache/cache.service';
 
 describe('PropertiesService - Agent Assignment', () => {
   let service: PropertiesService;
@@ -35,6 +37,8 @@ describe('PropertiesService - Agent Assignment', () => {
         PropertiesService,
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: FraudService, useValue: mockFraudService },
+        { provide: GeocodingService, useValue: { geocodeAddress: jest.fn(), hasAddressChanged: jest.fn().mockReturnValue(false) } },
+        { provide: CacheService, useValue: { get: jest.fn(), set: jest.fn(), del: jest.fn(), invalidateByTag: jest.fn() } },
       ],
     }).compile();
 

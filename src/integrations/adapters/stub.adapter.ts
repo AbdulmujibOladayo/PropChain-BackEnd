@@ -1,11 +1,22 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { IMlsAdapter, ICrmAdapter, IPaymentAdapter, MlsListing, CrmContact, PaymentResult } from '../contracts/adapters.interface';
+import {
+  IMlsAdapter,
+  ICrmAdapter,
+  IPaymentAdapter,
+  MlsListing,
+  CrmContact,
+  PaymentResult,
+} from '../contracts/adapters.interface';
 
 @Injectable()
 export class StubMlsAdapter implements IMlsAdapter {
   private readonly logger = new Logger(StubMlsAdapter.name);
 
-  async searchListings(query: { location?: string; minPrice?: number; maxPrice?: number }): Promise<MlsListing[]> {
+  async searchListings(query: {
+    location?: string;
+    minPrice?: number;
+    maxPrice?: number;
+  }): Promise<MlsListing[]> {
     this.logger.debug(`Stub MLS search: ${JSON.stringify(query)}`);
     return [];
   }

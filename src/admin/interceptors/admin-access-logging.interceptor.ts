@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-} from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -11,22 +6,13 @@ import { tap } from 'rxjs/operators';
 import { AuditService } from '../../audit/audit.service';
 
 @Injectable()
-export class AdminAccessLoggingInterceptor
-  implements NestInterceptor
-{
-  constructor(
-    private readonly auditService: AuditService,
-  ) {}
+export class AdminAccessLoggingInterceptor implements NestInterceptor {
+  constructor(private readonly auditService: AuditService) {}
 
-  intercept(
-    context: ExecutionContext,
-    next: CallHandler,
-  ): Observable<any> {
-    const request =
-      context.switchToHttp().getRequest();
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    const request = context.switchToHttp().getRequest();
 
-    const response =
-      context.switchToHttp().getResponse();
+    const response = context.switchToHttp().getResponse();
 
     return next.handle().pipe(
       tap(async () => {
@@ -41,8 +27,7 @@ export class AdminAccessLoggingInterceptor
             path: request.originalUrl,
             method: request.method,
             statusCode: response.statusCode,
-            timestamp:
-              new Date().toISOString(),
+            timestamp: new Date().toISOString(),
           },
         });
       }),

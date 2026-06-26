@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ForbiddenException } from '@nestjs/common';
 import { Decimal } from '@prisma/client/runtime/library';
 import { PropertiesService } from './properties.service';
 import { PrismaService } from '../database/prisma.service';
@@ -6,6 +7,7 @@ import { FraudService } from '../fraud/fraud.service';
 import { CreatePropertyDto } from './dto/property.dto';
 import { PropertyStatus, UserRole } from '../types/prisma.types';
 import { GeocodingService } from './geocoding.service';
+import { CacheService } from '../cache/cache.service';
 
 describe('PropertiesService', () => {
   let service: PropertiesService;
@@ -69,6 +71,7 @@ describe('PropertiesService', () => {
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: FraudService, useValue: mockFraudService },
         { provide: GeocodingService, useValue: mockGeocodingService },
+        { provide: CacheService, useValue: { get: jest.fn(), set: jest.fn(), del: jest.fn(), invalidateByTag: jest.fn() } },
       ],
     }).compile();
 
@@ -172,22 +175,36 @@ describe('PropertiesService', () => {
 
   describe('approveProperty', () => {
     it('should approve a pending property through the transition workflow', async () => {
-      const transitionSpy = jest.spyOn(service, 'transitionStatus').mockResolvedValue(mockProperty as any);
+      const transitionSpy = jest
+        .spyOn(service, 'transitionStatus')
+        .mockResolvedValue(mockProperty as any);
 
       const result = await service.approveProperty('prop-123', 'admin-1');
 
-      expect(transitionSpy).toHaveBeenCalledWith('prop-123', PropertyStatus.ACTIVE, 'admin-1', UserRole.ADMIN);
+      expect(transitionSpy).toHaveBeenCalledWith(
+        'prop-123',
+        PropertyStatus.ACTIVE,
+        'admin-1',
+        UserRole.ADMIN,
+      );
       expect(result).toBe(mockProperty);
     });
   });
 
   describe('rejectProperty', () => {
     it('should reject a pending property through the transition workflow', async () => {
-      const transitionSpy = jest.spyOn(service, 'transitionStatus').mockResolvedValue(mockProperty as any);
+      const transitionSpy = jest
+        .spyOn(service, 'transitionStatus')
+        .mockResolvedValue(mockProperty as any);
 
       const result = await service.rejectProperty('prop-123', 'admin-1');
 
-      expect(transitionSpy).toHaveBeenCalledWith('prop-123', PropertyStatus.ARCHIVED, 'admin-1', UserRole.ADMIN);
+      expect(transitionSpy).toHaveBeenCalledWith(
+        'prop-123',
+        PropertyStatus.ARCHIVED,
+        'admin-1',
+        UserRole.ADMIN,
+      );
       expect(result).toBe(mockProperty);
     });
   });

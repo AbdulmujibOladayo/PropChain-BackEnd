@@ -87,7 +87,7 @@ export class PropertyExpiryService {
           propertyId: property.id,
           propertyTitle: property.title,
           expiryDate: property.expiryDate,
-        }
+        },
       );
     }
   }
@@ -132,7 +132,7 @@ export class PropertyExpiryService {
           propertyId: property.id,
           propertyTitle: property.title,
           expiryDate: property.expiryDate,
-        }
+        },
       );
     }
   }

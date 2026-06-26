@@ -131,7 +131,10 @@ export class UsersService implements OnModuleInit {
 
   private readonly logger = new Logger(UsersService.name);
 
-  constructor(private prisma: PrismaService, private readonly sessionsService: SessionsService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly sessionsService: SessionsService,
+  ) {}
 
   onModuleInit() {
     setInterval(() => this.cleanupExports(), 60 * 60 * 1000);

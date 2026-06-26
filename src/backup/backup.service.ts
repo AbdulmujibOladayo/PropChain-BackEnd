@@ -156,7 +156,7 @@ export class BackupService implements OnModuleInit {
           restoredById: restoredById ?? null,
         },
       });
-      
+
       await this.notifyAdminsOfFailure('Restore', message, { backupId, retryCount: 0 });
 
       throw new InternalServerErrorException(`Backup restore failed: ${message}`);
@@ -245,7 +245,11 @@ export class BackupService implements OnModuleInit {
         await fs.promises.unlink(filePath).catch(() => undefined);
       }
 
-      await this.notifyAdminsOfFailure('Backup', message, { backupId: backup.id, trigger, retryCount: 0 }); // Retry handled in job
+      await this.notifyAdminsOfFailure('Backup', message, {
+        backupId: backup.id,
+        trigger,
+        retryCount: 0,
+      }); // Retry handled in job
 
       throw new InternalServerErrorException(`Backup creation failed: ${message}`);
     }
@@ -279,11 +283,19 @@ export class BackupService implements OnModuleInit {
           this.logger.error(`Scheduled backup attempt ${attempt} failed: ${errorMessage}`);
           if (attempt >= maxRetries) {
             this.logger.error('Scheduled backup failed after maximum retries.');
-            await this.notifyAdminsOfFailure('Scheduled Backup', errorMessage, { attempt, maxRetries, retryStatus: 'exhausted' });
+            await this.notifyAdminsOfFailure('Scheduled Backup', errorMessage, {
+              attempt,
+              maxRetries,
+              retryStatus: 'exhausted',
+            });
           } else {
-            await this.notifyAdminsOfFailure('Scheduled Backup', errorMessage, { attempt, maxRetries, retryStatus: 'retrying' });
+            await this.notifyAdminsOfFailure('Scheduled Backup', errorMessage, {
+              attempt,
+              maxRetries,
+              retryStatus: 'retrying',
+            });
             // Wait 5 minutes before retrying (300,000 ms)
-            await new Promise(res => setTimeout(res, 300000));
+            await new Promise((res) => setTimeout(res, 300000));
           }
         }
       }
@@ -457,7 +469,11 @@ export class BackupService implements OnModuleInit {
     return 'Unknown error';
   }
 
-  private async notifyAdminsOfFailure(jobType: string, errorMessage: string, additionalMetadata: any = {}) {
+  private async notifyAdminsOfFailure(
+    jobType: string,
+    errorMessage: string,
+    additionalMetadata: any = {},
+  ) {
     try {
       const admins = await this.prisma.user.findMany({
         where: { role: 'ADMIN' },
@@ -469,14 +485,12 @@ export class BackupService implements OnModuleInit {
 
       await Promise.all(
         admins.map((admin) =>
-          this.notificationsService.sendNotification(
-            admin.id,
-            title,
-            message,
-            'SYSTEM_ALERT',
-            { jobType, error: errorMessage, ...additionalMetadata }
-          )
-        )
+          this.notificationsService.sendNotification(admin.id, title, message, 'SYSTEM_ALERT', {
+            jobType,
+            error: errorMessage,
+            ...additionalMetadata,
+          }),
+        ),
       );
     } catch (err) {
       this.logger.error(`Failed to send admin notifications: ${this.toErrorMessage(err)}`);

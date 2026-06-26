@@ -40,7 +40,7 @@ export class BlockchainErrorClassifier {
    */
   static getActionableMessage(error: any): string {
     const message = error?.message || 'Unknown blockchain error';
-    
+
     // Strip sensitive internal URLs
     const sanitizedMessage = message.replace(/(https?:\/\/[^\s]+)/g, '<REDACTED_URL>');
 

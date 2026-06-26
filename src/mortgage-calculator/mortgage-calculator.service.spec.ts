@@ -84,9 +84,7 @@ describe('MortgageCalculatorService', () => {
       amortizationYears: 30,
     });
 
-    expect(result.totalPayment).toBe(
-      Math.round(result.monthlyPayment * 30 * 12 * 100) / 100,
-    );
+    expect(result.totalPayment).toBe(Math.round(result.monthlyPayment * 30 * 12 * 100) / 100);
   });
 
   it('totalInterest equals totalPayment minus loanAmount', () => {

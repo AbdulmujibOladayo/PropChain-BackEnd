@@ -118,9 +118,11 @@ export class TransactionResponseDto {
   @ApiPropertyOptional()
   notes?: string;
 
-  @ApiPropertyOptional({ description: 'Fee breakdown including platform fee, agent commission, and tax (#565)' })
+  @ApiPropertyOptional({
+    description: 'Fee breakdown including platform fee, agent commission, and tax (#565)',
+  })
   feeBreakdown?: FeeBreakdown;
-  
+
   @ApiPropertyOptional()
   escrowStatus?: string;
 

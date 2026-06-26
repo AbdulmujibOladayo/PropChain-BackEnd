@@ -1,4 +1,3 @@
-
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../database/prisma.service';
@@ -11,7 +10,7 @@ export class AuditPruningService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  @Cron(CronExpression.DAILY) 
+  @Cron(CronExpression.DAILY)
   async handleCron() {
     this.logger.log('Starting audit log pruning...');
     await this.prune();
@@ -34,7 +33,9 @@ export class AuditPruningService {
     if (transactionHistoryToPrune.length > 0) {
       const archiveFile = path.join(archivePath, `transaction-history-${Date.now()}.json`);
       await fs.writeFile(archiveFile, JSON.stringify(transactionHistoryToPrune, null, 2));
-      this.logger.log(`Archived ${transactionHistoryToPrune.length} transaction history records to ${archiveFile}`);
+      this.logger.log(
+        `Archived ${transactionHistoryToPrune.length} transaction history records to ${archiveFile}`,
+      );
 
       await this.prisma.transactionHistory.deleteMany({
         where: { id: { in: transactionHistoryToPrune.map((log) => log.id) } },
@@ -51,7 +52,9 @@ export class AuditPruningService {
     if (loginHistoryToPrune.length > 0) {
       const archiveFile = path.join(archivePath, `login-history-${Date.now()}.json`);
       await fs.writeFile(archiveFile, JSON.stringify(loginHistoryToPrune, null, 2));
-      this.logger.log(`Archived ${loginHistoryToPrune.length} login history records to ${archiveFile}`);
+      this.logger.log(
+        `Archived ${loginHistoryToPrune.length} login history records to ${archiveFile}`,
+      );
 
       await this.prisma.loginHistory.deleteMany({
         where: { id: { in: loginHistoryToPrune.map((log) => log.id) } },

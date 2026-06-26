@@ -241,19 +241,19 @@ export class PropertiesService {
     }
 
     return this.prisma.property.update({
-       where: { id },
-       data: {
-         ...rest,
-         price: price ? new Decimal(price.toString()) : undefined,
-         squareFeet: squareFeet ? new Decimal(squareFeet.toString()) : undefined,
-         lotSize: lotSize ? new Decimal(lotSize.toString()) : undefined,
-         hoaMonthlyFee:
-           hoaMonthlyFee !== undefined ? new Decimal(hoaMonthlyFee.toString()) : undefined,
-         latitude: resolvedLat,
-         longitude: resolvedLng,
-         expiryDate: updatePropertyDto.expiryDate,
-       },
-     });
+      where: { id },
+      data: {
+        ...rest,
+        price: price ? new Decimal(price.toString()) : undefined,
+        squareFeet: squareFeet ? new Decimal(squareFeet.toString()) : undefined,
+        lotSize: lotSize ? new Decimal(lotSize.toString()) : undefined,
+        hoaMonthlyFee:
+          hoaMonthlyFee !== undefined ? new Decimal(hoaMonthlyFee.toString()) : undefined,
+        latitude: resolvedLat,
+        longitude: resolvedLng,
+        expiryDate: updatePropertyDto.expiryDate,
+      },
+    });
   }
 
   async remove(id: string, user: AuthUserPayload) {
@@ -312,40 +312,40 @@ export class PropertiesService {
     return updated;
   }
 
-   async findByOwnerId(ownerId: string) {
-     return this.prisma.property.findMany({
-       where: { ownerId },
-       orderBy: { createdAt: 'desc' },
-     });
-   }
+  async findByOwnerId(ownerId: string) {
+    return this.prisma.property.findMany({
+      where: { ownerId },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
 
-   /**
-    * Expire properties that have passed their expiry date.
-    * This method should be called periodically by a scheduled job.
-    */
-   async expireProperties(): Promise<{ updatedCount: number }> {
-     const now = new Date();
-     const result = await this.prisma.property.updateMany({
-       where: {
-         expiryDate: {
-           lt: now, // Less than now (expired)
-         },
-         status: {
-           notIn: [
-             PropertyStatus.SOLD,
-             PropertyStatus.RENTED,
-             PropertyStatus.ARCHIVED,
-             PropertyStatus.EXPIRED, // Already expired
-           ],
-         },
-       },
-       data: {
-         status: PropertyStatus.EXPIRED,
-       },
-     });
+  /**
+   * Expire properties that have passed their expiry date.
+   * This method should be called periodically by a scheduled job.
+   */
+  async expireProperties(): Promise<{ updatedCount: number }> {
+    const now = new Date();
+    const result = await this.prisma.property.updateMany({
+      where: {
+        expiryDate: {
+          lt: now, // Less than now (expired)
+        },
+        status: {
+          notIn: [
+            PropertyStatus.SOLD,
+            PropertyStatus.RENTED,
+            PropertyStatus.ARCHIVED,
+            PropertyStatus.EXPIRED, // Already expired
+          ],
+        },
+      },
+      data: {
+        status: PropertyStatus.EXPIRED,
+      },
+    });
 
-     return { updatedCount: result.count };
-   }
+    return { updatedCount: result.count };
+  }
 
   /**
    * Transition a property's status according to the workflow state machine.
@@ -440,8 +440,16 @@ export class PropertiesService {
 
       const filtered = annotated.filter((p: any) => {
         const score = p.neighborhoodTrustScore;
-        if (dto.minNeighborhoodTrustScore !== undefined && (score === null || score < dto.minNeighborhoodTrustScore)) return false;
-        if (dto.maxNeighborhoodTrustScore !== undefined && (score === null || score > dto.maxNeighborhoodTrustScore)) return false;
+        if (
+          dto.minNeighborhoodTrustScore !== undefined &&
+          (score === null || score < dto.minNeighborhoodTrustScore)
+        )
+          return false;
+        if (
+          dto.maxNeighborhoodTrustScore !== undefined &&
+          (score === null || score > dto.maxNeighborhoodTrustScore)
+        )
+          return false;
         return true;
       });
 
@@ -631,10 +639,16 @@ export class PropertiesService {
       if (dto.minLng !== undefined) lngFilter.gte = dto.minLng;
       if (dto.maxLng !== undefined) lngFilter.lte = dto.maxLng;
       if (Object.keys(latFilter).length > 0) {
-        where.latitude = { ...(where.latitude as Record<string, number> | undefined), ...latFilter };
+        where.latitude = {
+          ...(where.latitude as Record<string, number> | undefined),
+          ...latFilter,
+        };
       }
       if (Object.keys(lngFilter).length > 0) {
-        where.longitude = { ...(where.longitude as Record<string, number> | undefined), ...lngFilter };
+        where.longitude = {
+          ...(where.longitude as Record<string, number> | undefined),
+          ...lngFilter,
+        };
       }
     }
 

@@ -2,7 +2,6 @@ import { IsIn, IsInt, IsNumber, IsOptional, IsString, Max, Min } from 'class-val
 import { Type } from 'class-transformer';
 import { PROPERTY_STATUS_ENUM } from './property.dto';
 
-
 export const PROPERTY_SORT_FIELDS = [
   'price',
   'createdAt',
@@ -105,19 +104,19 @@ export class SearchPropertiesDto {
   @Min(0)
   maxBathrooms?: number;
 
-   // ----- Status -----
-   @IsOptional()
-   @IsIn(PROPERTY_STATUS_ENUM)
-   status?: (typeof PROPERTY_STATUS_ENUM)[number];
+  // ----- Status -----
+  @IsOptional()
+  @IsIn(PROPERTY_STATUS_ENUM)
+  status?: (typeof PROPERTY_STATUS_ENUM)[number];
 
-   // ----- Expiry date -----
-   @IsOptional()
-   @Type(() => Date)
-   minExpiryDate?: Date;
+  // ----- Expiry date -----
+  @IsOptional()
+  @Type(() => Date)
+  minExpiryDate?: Date;
 
-   @IsOptional()
-   @Type(() => Date)
-   maxExpiryDate?: Date;
+  @IsOptional()
+  @Type(() => Date)
+  maxExpiryDate?: Date;
 
   // ----- Pagination -----
   @IsOptional()

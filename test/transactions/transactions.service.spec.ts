@@ -4,6 +4,9 @@ import { PrismaService } from '../../src/database/prisma.service';
 import { BlockchainService } from '../../src/blockchain/blockchain.service';
 import { NotificationsService } from '../../src/notifications/notifications.service';
 import { CommissionsService } from '../../src/commissions/commissions.service';
+import { TransactionFeesService } from '../../src/transactions/transaction-fees.service';
+import { TimelineService } from '../../src/transactions/timeline.service';
+import { TransactionAuditService } from '../../src/transactions/transaction-audit.service';
 import { TransactionStatus, TransactionType, UserRole } from '../../src/types/prisma.types';
 import { TransactionsService } from '../../src/transactions/transactions.service';
 
@@ -60,6 +63,9 @@ describe('TransactionsService', () => {
         { provide: BlockchainService, useValue: mockBlockchainService },
         { provide: NotificationsService, useValue: mockNotificationsService },
         { provide: CommissionsService, useValue: mockCommissionsService },
+        { provide: TransactionFeesService, useValue: { calculateFees: jest.fn() } },
+        { provide: TimelineService, useValue: { addMilestone: jest.fn(), updateMilestone: jest.fn(), getTimeline: jest.fn(), addStageEvent: jest.fn() } },
+        { provide: TransactionAuditService, useValue: { log: jest.fn(), findByTransaction: jest.fn() } },
       ],
     }).compile();
 

@@ -62,14 +62,20 @@ export class OpenHouseService {
 
     const title = `RSVP Confirmed: ${openHouse.title}`;
     const message = `Your RSVP status is ${dto.status} for "${openHouse.property.title}" at ${openHouse.property.address}.`;
-    await this.notificationsService.sendNotification(dto.userId, title, message, 'OPEN_HOUSE_RSVP', {
-      openHouseId,
-      status: dto.status,
-      propertyTitle: openHouse.property.title,
-      propertyAddress: openHouse.property.address,
-      startAt: openHouse.startAt,
-      endAt: openHouse.endAt,
-    });
+    await this.notificationsService.sendNotification(
+      dto.userId,
+      title,
+      message,
+      'OPEN_HOUSE_RSVP',
+      {
+        openHouseId,
+        status: dto.status,
+        propertyTitle: openHouse.property.title,
+        propertyAddress: openHouse.property.address,
+        startAt: openHouse.startAt,
+        endAt: openHouse.endAt,
+      },
+    );
 
     return rsvp;
   }

@@ -6,6 +6,9 @@ import { BlockchainService } from '../blockchain/blockchain.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { TransactionAnalyticsGranularity, TransactionTypeDto } from './dto/transaction.dto';
 import { CommissionsService } from '../commissions/commissions.service';
+import { TransactionFeesService } from './transaction-fees.service';
+import { TimelineService } from './timeline.service';
+import { TransactionAuditService } from './transaction-audit.service';
 
 describe('TransactionsService', () => {
   let service: TransactionsService;
@@ -54,6 +57,9 @@ describe('TransactionsService', () => {
         { provide: BlockchainService, useValue: mockBlockchainService },
         { provide: NotificationsService, useValue: mockNotificationsService },
         { provide: CommissionsService, useValue: mockCommissionsService },
+        { provide: TransactionFeesService, useValue: { calculateFees: jest.fn() } },
+        { provide: TimelineService, useValue: { addMilestone: jest.fn(), updateMilestone: jest.fn(), getTimeline: jest.fn(), addStageEvent: jest.fn() } },
+        { provide: TransactionAuditService, useValue: { log: jest.fn(), findByTransaction: jest.fn() } },
       ],
     }).compile();
 

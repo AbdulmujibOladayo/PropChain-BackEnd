@@ -215,10 +215,7 @@ export class PropertiesController {
 
   @UseGuards(JwtAuthGuard)
   @Post(':id/amenities')
-  async addAmenity(
-    @Param('id') propertyId: string,
-    @Body() dto: CreateAmenityDto,
-  ) {
+  async addAmenity(@Param('id') propertyId: string, @Body() dto: CreateAmenityDto) {
     return this.propertiesService.addAmenity(propertyId, dto);
   }
 
@@ -239,10 +236,7 @@ export class PropertiesController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id/amenities/:amenityId')
-  async removeAmenity(
-    @Param('id') propertyId: string,
-    @Param('amenityId') amenityId: string,
-  ) {
+  async removeAmenity(@Param('id') propertyId: string, @Param('amenityId') amenityId: string) {
     return this.propertiesService.removeAmenity(propertyId, amenityId);
   }
 }

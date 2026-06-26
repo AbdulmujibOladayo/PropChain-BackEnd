@@ -32,7 +32,12 @@ export class DocumentsDownloadController {
 
     let targetFileUrl = doc.fileUrl;
     if (query.versionId) {
-      const version = await this.documentsService.getVersion(id, query.versionId, user.sub, (user as any).role);
+      const version = await this.documentsService.getVersion(
+        id,
+        query.versionId,
+        user.sub,
+        (user as any).role,
+      );
       targetFileUrl = version.fileUrl;
     }
 

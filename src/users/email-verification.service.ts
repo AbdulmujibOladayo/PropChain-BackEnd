@@ -52,17 +52,19 @@ export class EmailVerificationService {
     });
 
     // Send verification email with token
-    await this.emailService.sendEmail({
-      to: data.newEmail,
-      subject: 'Verify your email - PropChain',
-      template: 'email-verification',
-      context: { token },
-      userId: userId,
-      emailType: 'email_verification',
-    }).catch((err) => {
-      // Fail quietly but log
-      console.error('Failed to queue verification email:', err?.message || err);
-    });
+    await this.emailService
+      .sendEmail({
+        to: data.newEmail,
+        subject: 'Verify your email - PropChain',
+        template: 'email-verification',
+        context: { token },
+        userId: userId,
+        emailType: 'email_verification',
+      })
+      .catch((err) => {
+        // Fail quietly but log
+        console.error('Failed to queue verification email:', err?.message || err);
+      });
 
     return {
       message: 'Verification email sent. Please check your new email to verify the change.',
@@ -99,16 +101,18 @@ export class EmailVerificationService {
     });
 
     // Send verification email
-    await this.emailService.sendEmail({
-      to: user.pendingEmail,
-      subject: 'Verify your email - PropChain',
-      template: 'email-verification',
-      context: { token },
-      userId: userId,
-      emailType: 'email_verification',
-    }).catch((err) => {
-      console.error('Failed to queue verification email:', err?.message || err);
-    });
+    await this.emailService
+      .sendEmail({
+        to: user.pendingEmail,
+        subject: 'Verify your email - PropChain',
+        template: 'email-verification',
+        context: { token },
+        userId: userId,
+        emailType: 'email_verification',
+      })
+      .catch((err) => {
+        console.error('Failed to queue verification email:', err?.message || err);
+      });
 
     return { message: 'Verification email resent' };
   }

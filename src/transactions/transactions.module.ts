@@ -21,10 +21,16 @@ import { CommissionsModule } from '../commissions/commissions.module';
     TransactionFeesService,
     TransactionNotesService,
     TransactionRemindersService,
-  TransactionAuditService, 
-  TimelineService,
+    TransactionAuditService,
+    TimelineService,
   ],
   controllers: [TransactionsController, DisputesController],
-  exports: [TransactionsService, TransactionFeesService, TransactionNotesService, TransactionAuditService, TimelineService],
+  exports: [
+    TransactionsService,
+    TransactionFeesService,
+    TransactionNotesService,
+    TransactionAuditService,
+    TimelineService,
+  ],
 })
 export class TransactionsModule {}

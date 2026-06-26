@@ -279,19 +279,13 @@ export class TransactionsController {
 
   @Get(':id/notes')
   @ApiOperation({ summary: 'Get transaction notes (visibility enforced) (#562)' })
-  async getNotes(
-    @Param('id') transactionId: string,
-    @CurrentUser() user: AuthUserPayload,
-  ) {
+  async getNotes(@Param('id') transactionId: string, @CurrentUser() user: AuthUserPayload) {
     return this.transactionNotesService.findByTransaction(transactionId, user.sub, user.role);
   }
 
   @Delete(':transactionId/notes/:noteId')
   @ApiOperation({ summary: 'Delete a transaction note (#562)' })
-  async deleteNote(
-    @Param('noteId') noteId: string,
-    @CurrentUser() user: AuthUserPayload,
-  ) {
+  async deleteNote(@Param('noteId') noteId: string, @CurrentUser() user: AuthUserPayload) {
     return this.transactionNotesService.remove(noteId, user.sub, user.role);
   }
 

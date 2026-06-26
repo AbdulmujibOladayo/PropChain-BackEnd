@@ -35,11 +35,15 @@ describe('EmailVerificationService', () => {
     };
 
     const mockEmailService: any = { sendEmail: jest.fn() };
-    const mockRateLimitService: any = { checkEndpointRateLimit: jest.fn().mockResolvedValue({ isExceeded: false }) };
+    const mockRateLimitService: any = {
+      checkEndpointRateLimit: jest.fn().mockResolvedValue({ isExceeded: false }),
+    };
 
     const svc = new EmailVerificationService(mockPrisma, mockEmailService, mockRateLimitService);
 
-    await expect(svc.resendVerification('user1')).rejects.toThrow('No pending email change to resend verification for');
+    await expect(svc.resendVerification('user1')).rejects.toThrow(
+      'No pending email change to resend verification for',
+    );
   });
 
   it('clears expired verification token and throws an informative message', async () => {
@@ -61,7 +65,9 @@ describe('EmailVerificationService', () => {
 
     const svc = new EmailVerificationService(mockPrisma, mockEmailService, mockRateLimitService);
 
-    await expect(svc.verifyEmailChange('user1', 'expired-token')).rejects.toThrow('Verification token has expired');
+    await expect(svc.verifyEmailChange('user1', 'expired-token')).rejects.toThrow(
+      'Verification token has expired',
+    );
     expect(mockPrisma.user.update).toHaveBeenCalledWith({
       where: { id: 'user1' },
       data: {

@@ -25,7 +25,11 @@ export interface CrmContact {
 
 export const MLS_ADAPTER = 'MLS_ADAPTER';
 export interface IMlsAdapter {
-  searchListings(query: { location?: string; minPrice?: number; maxPrice?: number }): Promise<MlsListing[]>;
+  searchListings(query: {
+    location?: string;
+    minPrice?: number;
+    maxPrice?: number;
+  }): Promise<MlsListing[]>;
   getListing(mlsId: string): Promise<MlsListing | null>;
 }
 

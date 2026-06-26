@@ -119,14 +119,30 @@ describe('PropertiesController - RBAC', () => {
   let controller: PropertiesController;
   let service: jest.Mocked<PropertiesService>;
 
-  const adminUser: AuthUserPayload = { sub: 'admin-1', email: 'admin@test.com', role: UserRole.ADMIN, type: 'access' };
-  const regularUser: AuthUserPayload = { sub: 'user-1', email: 'user@test.com', role: UserRole.USER, type: 'access' };
+  const adminUser: AuthUserPayload = {
+    sub: 'admin-1',
+    email: 'admin@test.com',
+    role: UserRole.ADMIN,
+    type: 'access',
+  };
+  const regularUser: AuthUserPayload = {
+    sub: 'user-1',
+    email: 'user@test.com',
+    role: UserRole.USER,
+    type: 'access',
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [PropertiesController],
       providers: [
-        { provide: PropertiesService, useValue: { create: jest.fn().mockResolvedValue({ id: 'p1' }), findAll: jest.fn().mockResolvedValue([]) } },
+        {
+          provide: PropertiesService,
+          useValue: {
+            create: jest.fn().mockResolvedValue({ id: 'p1' }),
+            findAll: jest.fn().mockResolvedValue([]),
+          },
+        },
         { provide: PropertyReportService, useValue: {} },
       ],
     })
@@ -139,14 +155,30 @@ describe('PropertiesController - RBAC', () => {
   });
 
   it('USER can create a property (authenticated)', async () => {
-    const dto = { title: 'Test', address: '1 Main', city: 'NY', state: 'NY', zipCode: '10001', price: 100000, propertyType: 'House' } as any;
+    const dto = {
+      title: 'Test',
+      address: '1 Main',
+      city: 'NY',
+      state: 'NY',
+      zipCode: '10001',
+      price: 100000,
+      propertyType: 'House',
+    } as any;
     const result = await controller.create(dto, regularUser);
     expect(result).toEqual({ id: 'p1' });
     expect(service.create).toHaveBeenCalledWith(dto, regularUser.sub);
   });
 
   it('ADMIN can create a property', async () => {
-    const dto = { title: 'Admin Prop', address: '2 Main', city: 'NY', state: 'NY', zipCode: '10001', price: 200000, propertyType: 'Condo' } as any;
+    const dto = {
+      title: 'Admin Prop',
+      address: '2 Main',
+      city: 'NY',
+      state: 'NY',
+      zipCode: '10001',
+      price: 200000,
+      propertyType: 'Condo',
+    } as any;
     await controller.create(dto, adminUser);
     expect(service.create).toHaveBeenCalledWith(dto, adminUser.sub);
   });

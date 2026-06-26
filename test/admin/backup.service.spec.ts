@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { BackupStatus, BackupTrigger, RestoreStatus } from '@prisma/client';
 import { BackupService } from '../../src/backup/backup.service';
 import { PrismaService } from '../../src/database/prisma.service';
+import { NotificationsService } from '../../src/notifications/notifications.service';
 
 describe('BackupService', () => {
   let service: BackupService;
@@ -44,6 +45,7 @@ describe('BackupService', () => {
         BackupService,
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: ConfigService, useValue: mockConfigService },
+        { provide: NotificationsService, useValue: { notify: jest.fn(), sendAdminAlert: jest.fn() } },
       ],
     }).compile();
 

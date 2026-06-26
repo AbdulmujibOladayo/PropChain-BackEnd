@@ -64,13 +64,19 @@ export class NotificationsService {
           transactionId: transaction.id,
           propertyTitle: transaction.property.title,
           propertyAddress: `${transaction.property.address}, ${transaction.property.city}, ${transaction.property.state} ${transaction.property.zipCode}`,
-          buyerName: transaction.buyer.firstName ? `${transaction.buyer.firstName} ${transaction.buyer.lastName || ''}` : transaction.buyer.email,
-          sellerName: transaction.seller.firstName ? `${transaction.seller.firstName} ${transaction.seller.lastName || ''}` : transaction.seller.email,
+          buyerName: transaction.buyer.firstName
+            ? `${transaction.buyer.firstName} ${transaction.buyer.lastName || ''}`
+            : transaction.buyer.email,
+          sellerName: transaction.seller.firstName
+            ? `${transaction.seller.firstName} ${transaction.seller.lastName || ''}`
+            : transaction.seller.email,
           amount: `$${Number(transaction.amount || 0).toLocaleString()}`,
-          completionDate: transaction.status === 'COMPLETED' ? new Date().toLocaleDateString() : undefined,
+          completionDate:
+            transaction.status === 'COMPLETED' ? new Date().toLocaleDateString() : undefined,
           blockchainTxHash: transaction.blockchainTxHash || undefined,
           cancellationReason: transaction.cancellationReason || undefined,
-          cancelledDate: transaction.status === 'CANCELLED' ? new Date().toLocaleDateString() : undefined,
+          cancelledDate:
+            transaction.status === 'CANCELLED' ? new Date().toLocaleDateString() : undefined,
         });
       }
 

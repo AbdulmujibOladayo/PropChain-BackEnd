@@ -29,10 +29,7 @@ export class DuplicateDetectionController {
 
   @UseGuards(JwtAuthGuard)
   @Post(':propertyId/flag')
-  async flagForReview(
-    @Param('propertyId') propertyId: string,
-    @Body() dto: FlagForReviewDto,
-  ) {
+  async flagForReview(@Param('propertyId') propertyId: string, @Body() dto: FlagForReviewDto) {
     return this.duplicateDetectionService.flagForReview(
       propertyId,
       dto.duplicateOfId,

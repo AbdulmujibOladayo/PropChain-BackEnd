@@ -184,9 +184,9 @@ describe('BlockchainService', () => {
     it('should reject recording for non-existent transaction', async () => {
       mockPrismaService.transaction.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.recordTransactionOnBlockchain(validDto),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.recordTransactionOnBlockchain(validDto)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should reject recording for non-COMPLETED transaction', async () => {
@@ -195,9 +195,9 @@ describe('BlockchainService', () => {
         status: 'PENDING',
       });
 
-      await expect(
-        service.recordTransactionOnBlockchain(validDto),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.recordTransactionOnBlockchain(validDto)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should accept recording for COMPLETED transaction', async () => {
@@ -297,9 +297,7 @@ describe('BlockchainService', () => {
         transactionHash: '123abc',
       };
 
-      await expect(
-        service.verifyBlockchainTransaction(dto),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.verifyBlockchainTransaction(dto)).rejects.toThrow(BadRequestException);
     });
 
     it('should reject empty transaction hash', async () => {
@@ -307,9 +305,7 @@ describe('BlockchainService', () => {
         transactionHash: '',
       };
 
-      await expect(
-        service.verifyBlockchainTransaction(dto),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.verifyBlockchainTransaction(dto)).rejects.toThrow(BadRequestException);
     });
   });
 

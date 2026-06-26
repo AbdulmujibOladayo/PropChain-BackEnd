@@ -175,16 +175,14 @@ export class BlockchainService {
     });
 
     if (!transaction) {
-      throw new BadRequestException(
-        `Transaction ${dto.transactionId} not found`,
-      );
+      throw new BadRequestException(`Transaction ${dto.transactionId} not found`);
     }
 
     const txStatus = transaction.status as unknown as TransactionStatus;
     if (!BlockchainService.ALLOWED_TRANSACTION_STATUSES.includes(txStatus)) {
       throw new BadRequestException(
         `Transaction status '${txStatus}' is not allowed for blockchain recording. ` +
-        `Only ${BlockchainService.ALLOWED_TRANSACTION_STATUSES.join(', ')} transactions can be recorded.`,
+          `Only ${BlockchainService.ALLOWED_TRANSACTION_STATUSES.join(', ')} transactions can be recorded.`,
       );
     }
   }
@@ -255,9 +253,11 @@ export class BlockchainService {
           break; // Success, exit retry loop
         } catch (error) {
           const errorType = BlockchainErrorClassifier.classify(error);
-          
+
           if (errorType === BlockchainErrorType.RETRYABLE && attempt < maxRetries) {
-            this.logger.warn(`Blockchain call failed (attempt ${attempt}/${maxRetries}), retrying...`);
+            this.logger.warn(
+              `Blockchain call failed (attempt ${attempt}/${maxRetries}), retrying...`,
+            );
             await new Promise((resolve) => setTimeout(resolve, 2000 * attempt));
           } else {
             const actionableMessage = BlockchainErrorClassifier.getActionableMessage(error);
@@ -377,9 +377,7 @@ export class BlockchainService {
     try {
       // Validate input
       if (!dto.transactionHash || !dto.transactionHash.startsWith('0x')) {
-        throw new BadRequestException(
-          'Invalid transaction hash. Must start with 0x prefix.',
-        );
+        throw new BadRequestException('Invalid transaction hash. Must start with 0x prefix.');
       }
 
       const network = dto.network || this.config?.network || BlockchainNetwork.SEPOLIA;
@@ -390,11 +388,11 @@ export class BlockchainService {
       const cached = this.findCachedTransaction(dto.transactionHash);
       if (cached) {
         const result = this.formatVerificationResult(cached, network);
-        await this.logBlockchainInteraction(
-          cached.id,
-          'verify-cached',
-          { transactionHash: dto.transactionHash, network, verified: true },
-        );
+        await this.logBlockchainInteraction(cached.id, 'verify-cached', {
+          transactionHash: dto.transactionHash,
+          network,
+          verified: true,
+        });
         return result;
       }
 

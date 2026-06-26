@@ -5,6 +5,7 @@ import { CreatePropertyDto } from './dto/property.dto';
 import { AuthUserPayload } from '../auth/types/auth-user.type';
 import { UserRole } from '../types/prisma.types';
 import { AuthService } from '../auth/auth.service';
+import { PropertyReportService } from './report/property-report.service';
 
 describe('PropertiesController', () => {
   let controller: PropertiesController;

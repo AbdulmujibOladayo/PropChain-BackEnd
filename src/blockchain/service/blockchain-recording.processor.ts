@@ -1,23 +1,13 @@
-@Processor(
-  'blockchain-recording',
-)
+@Processor('blockchain-recording')
 export class BlockchainRecordingProcessor {
-  constructor(
-    private readonly blockchainService:
-      BlockchainService,
-  ) {}
+  constructor(private readonly blockchainService: BlockchainService) {}
 
-  @Process(
-    'record-blockchain-transaction',
-  )
+  @Process('record-blockchain-transaction')
   async handle(
     job: Job<{
       transactionId: string;
     }>,
   ) {
-    return this.blockchainService
-      .submitTransaction(
-        job.data.transactionId,
-      );
+    return this.blockchainService.submitTransaction(job.data.transactionId);
   }
 }

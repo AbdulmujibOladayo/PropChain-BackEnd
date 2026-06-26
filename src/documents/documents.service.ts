@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import * as crypto from 'crypto';
 import * as archiver from 'archiver';
 import { Response } from 'express';
@@ -56,18 +61,14 @@ export class DocumentsService {
 
     // Issue #570: Access Control Defaults
     if (userRole !== 'ADMIN') {
-      where.OR = [
-        { userId },
-        { isPublic: true },
-        { sharedWith: { has: userId } }
-      ];
+      where.OR = [{ userId }, { isPublic: true }, { sharedWith: { has: userId } }];
     }
 
     if (filter.category) where.category = filter.category;
     if (filter.tags?.length) where.tags = { hasSome: filter.tags };
     if (filter.isExpired !== undefined) where.isExpired = filter.isExpired;
     if (filter.documentType) where.documentType = filter.documentType;
-    
+
     // Issue #573: Hide expired/archived by default
     where.status = filter.status || 'ACTIVE';
 
@@ -117,15 +118,15 @@ export class DocumentsService {
 
   async findAuthorizedById(id: string, userId: string, userRole?: string) {
     const doc = await this.findOne(id);
-    
+
     const isAdmin = userRole === 'ADMIN';
     const isOwner = doc.userId === userId;
     const isShared = doc.sharedWith.includes(userId);
-    
+
     if (!isAdmin && !isOwner && !doc.isPublic && !isShared) {
       throw new ForbiddenException('Access denied to this document');
     }
-    
+
     return doc;
   }
 
@@ -282,9 +283,7 @@ export class DocumentsService {
     const prefix = params.category ?? 'documents';
     const timestamp = Date.now();
     const random = crypto.randomBytes(4).toString('hex');
-    const safeName = params.fileName
-      .replace(/[^a-zA-Z0-9._-]/g, '_')
-      .toLowerCase();
+    const safeName = params.fileName.replace(/[^a-zA-Z0-9._-]/g, '_').toLowerCase();
     return `${prefix}/${params.userId}/${timestamp}-${random}-${safeName}`;
   }
 

@@ -68,6 +68,11 @@ jobs:
           sleep 2
         done
 
+    - name: Sync Prisma schema to test database
+      run: npx prisma db push --skip-generate --accept-data-loss
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test
+
     - name: Run tests
       run: npm test
       env:

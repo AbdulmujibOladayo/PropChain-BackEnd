@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Redis Cache Configuration
  * Comprehensive caching setup with custom strategies

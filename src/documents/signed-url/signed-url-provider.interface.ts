@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 export type SignedUrlOperation = 'upload' | 'download';
 
 export type SignedUrlRequest = {

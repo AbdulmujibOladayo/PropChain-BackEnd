@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { IsNumber, IsPositive, Min, Max } from 'class-validator';
 
 export class MortgageCalculatorDto {

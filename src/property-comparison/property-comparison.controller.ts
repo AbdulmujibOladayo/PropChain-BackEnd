@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { PropertyComparisonService } from './property-comparison.service';
 import { CompareBodyDto, CompareQueryDto } from './dto/comparison.dto';

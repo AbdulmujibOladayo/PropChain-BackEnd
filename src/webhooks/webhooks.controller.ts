@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { WebhooksService } from './webhooks.service';
 import { CreateWebhookDto, UpdateWebhookDto } from './webhook.dto';

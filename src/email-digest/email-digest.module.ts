@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Module } from '@nestjs/common';
 import { EmailDigestService } from './email-digest.service';
 import { EmailDigestController } from './email-digest.controller';

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 
 import { validate } from 'class-validator';

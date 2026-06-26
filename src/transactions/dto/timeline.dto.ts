@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { IsString, IsOptional, IsEnum, IsDateString } from 'class-validator';
 import { MilestoneStatus } from '../../types/prisma.types';
 

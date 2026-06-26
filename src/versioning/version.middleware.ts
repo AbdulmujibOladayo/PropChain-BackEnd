@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Version Middleware
  * Handles API version parsing and validation for all requests

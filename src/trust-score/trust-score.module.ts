@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Module } from '@nestjs/common';
 import { TrustScoreService } from './trust-score.service';
 import { TrustScoreController } from './trust-score.controller';

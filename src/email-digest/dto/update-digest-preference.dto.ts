@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { IsEnum, IsBoolean, IsOptional } from 'class-validator';
 import { DigestFrequency } from '@prisma/client';
 

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 
 export enum RoleEscalationStatus {

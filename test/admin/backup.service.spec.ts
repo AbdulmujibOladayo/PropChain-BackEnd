@@ -45,7 +45,10 @@ describe('BackupService', () => {
         BackupService,
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: ConfigService, useValue: mockConfigService },
-        { provide: NotificationsService, useValue: { notify: jest.fn(), sendAdminAlert: jest.fn() } },
+        {
+          provide: NotificationsService,
+          useValue: { notify: jest.fn(), sendAdminAlert: jest.fn() },
+        },
       ],
     }).compile();
 

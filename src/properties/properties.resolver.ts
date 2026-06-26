@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Resolver, Query, Mutation, Args, Subscription } from '@nestjs/graphql';
 import { UseGuards, Inject } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';

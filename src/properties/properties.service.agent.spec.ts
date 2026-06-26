@@ -37,8 +37,17 @@ describe('PropertiesService - Agent Assignment', () => {
         PropertiesService,
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: FraudService, useValue: mockFraudService },
-        { provide: GeocodingService, useValue: { geocodeAddress: jest.fn(), hasAddressChanged: jest.fn().mockReturnValue(false) } },
-        { provide: CacheService, useValue: { get: jest.fn(), set: jest.fn(), del: jest.fn(), invalidateByTag: jest.fn() } },
+        {
+          provide: GeocodingService,
+          useValue: {
+            geocodeAddress: jest.fn(),
+            hasAddressChanged: jest.fn().mockReturnValue(false),
+          },
+        },
+        {
+          provide: CacheService,
+          useValue: { get: jest.fn(), set: jest.fn(), del: jest.fn(), invalidateByTag: jest.fn() },
+        },
       ],
     }).compile();
 

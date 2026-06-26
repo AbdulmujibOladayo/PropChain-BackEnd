@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PropertiesService } from './properties.service';

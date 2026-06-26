@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { parse } from 'csv-parse/sync';

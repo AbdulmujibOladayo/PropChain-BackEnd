@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';

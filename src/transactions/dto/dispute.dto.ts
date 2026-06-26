@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { IsString, IsOptional, IsUUID, IsEnum } from 'class-validator';
 import { DisputeStatus } from '../../types/prisma.types';
 

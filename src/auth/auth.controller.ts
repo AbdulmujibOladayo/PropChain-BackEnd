@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Body, Controller, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {

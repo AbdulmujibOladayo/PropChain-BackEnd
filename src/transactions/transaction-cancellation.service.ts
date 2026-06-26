@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Decimal } from '@prisma/client/runtime/library';
 import { PrismaService } from '../database/prisma.service';

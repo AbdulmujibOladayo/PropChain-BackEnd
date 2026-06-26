@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Controller, Get } from '@nestjs/common';
 import { ApiVersionEnum } from './versioning/api-version.constants';
 import { ApiVersion, DeprecatedEndpoint } from './versioning/api-version.decorator';

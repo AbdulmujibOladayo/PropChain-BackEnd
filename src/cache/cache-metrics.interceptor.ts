@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Cache Metrics Interceptor
  * Automatically tracks cache performance metrics

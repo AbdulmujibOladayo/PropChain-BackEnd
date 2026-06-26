@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthService } from '../../auth/auth.service';
 

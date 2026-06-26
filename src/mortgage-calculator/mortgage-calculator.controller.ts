@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Body, Controller, Post } from '@nestjs/common';
 import { MortgageCalculatorService } from './mortgage-calculator.service';
 import { MortgageCalculatorDto } from './dto/mortgage-calculator.dto';

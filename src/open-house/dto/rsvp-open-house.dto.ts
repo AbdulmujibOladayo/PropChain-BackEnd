@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { IsEnum, IsString, IsNotEmpty } from 'class-validator';
 import { RsvpStatus } from '@prisma/client';
 

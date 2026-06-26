@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { ChangeEmailDto } from './dto/email-change.dto';

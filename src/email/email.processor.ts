@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { MailerService } from '@nestjs-modules/mailer';

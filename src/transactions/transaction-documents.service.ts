@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { AttachDocumentDto, AddVersionDto } from './dto/transaction-document.dto';

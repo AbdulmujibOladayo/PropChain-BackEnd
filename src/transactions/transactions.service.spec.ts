@@ -58,8 +58,19 @@ describe('TransactionsService', () => {
         { provide: NotificationsService, useValue: mockNotificationsService },
         { provide: CommissionsService, useValue: mockCommissionsService },
         { provide: TransactionFeesService, useValue: { calculateFees: jest.fn() } },
-        { provide: TimelineService, useValue: { addMilestone: jest.fn(), updateMilestone: jest.fn(), getTimeline: jest.fn(), addStageEvent: jest.fn() } },
-        { provide: TransactionAuditService, useValue: { log: jest.fn(), findByTransaction: jest.fn() } },
+        {
+          provide: TimelineService,
+          useValue: {
+            addMilestone: jest.fn(),
+            updateMilestone: jest.fn(),
+            getTimeline: jest.fn(),
+            addStageEvent: jest.fn(),
+          },
+        },
+        {
+          provide: TransactionAuditService,
+          useValue: { log: jest.fn(), findByTransaction: jest.fn() },
+        },
       ],
     }).compile();
 

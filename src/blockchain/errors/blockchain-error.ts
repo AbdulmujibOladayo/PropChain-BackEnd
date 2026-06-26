@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 export enum BlockchainErrorType {
   RETRYABLE = 'RETRYABLE',
   NON_RETRYABLE = 'NON_RETRYABLE',

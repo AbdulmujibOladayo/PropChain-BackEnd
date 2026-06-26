@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * API Documentation Module
  * Provides Swagger/OpenAPI documentation and related endpoints

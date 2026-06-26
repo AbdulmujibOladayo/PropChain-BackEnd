@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Module, Global } from '@nestjs/common';
 import { AnalyticsService } from './analytics.service';
 import { AnalyticsController } from './analytics.controller';

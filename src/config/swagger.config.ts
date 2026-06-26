@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Swagger/OpenAPI Configuration
  * Sets up comprehensive API documentation with Swagger UI

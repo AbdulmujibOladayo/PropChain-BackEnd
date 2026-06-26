@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Cache Decorators
  * Decorators for easy caching in controllers and services

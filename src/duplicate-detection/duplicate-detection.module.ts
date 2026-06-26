@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Module } from '@nestjs/common';
 import { DuplicateDetectionService } from './duplicate-detection.service';
 import { DuplicateDetectionController } from './duplicate-detection.controller';

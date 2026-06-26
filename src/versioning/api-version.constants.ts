@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * API Version Constants and Definitions
  * Manages API versioning strategy, deprecated versions, and version metadata

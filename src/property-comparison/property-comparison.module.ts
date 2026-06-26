@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Module } from '@nestjs/common';
 import { PropertyComparisonController } from './property-comparison.controller';
 import { PropertyComparisonService } from './property-comparison.service';

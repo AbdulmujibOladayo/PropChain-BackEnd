@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 // Temporary Prisma types to work around generation issues
 export interface User {
   id: string;

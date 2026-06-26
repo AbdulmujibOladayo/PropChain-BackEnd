@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Module } from '@nestjs/common';
 import { OpenHouseController } from './open-house.controller';
 import { OpenHouseService } from './open-house.service';

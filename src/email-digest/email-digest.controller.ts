@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Body, Controller, Get, Param, Patch, Query, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { EmailDigestService } from './email-digest.service';

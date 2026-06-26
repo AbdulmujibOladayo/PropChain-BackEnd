@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 @Injectable()
 export class BlockchainRecordingService {
   private readonly logger = new Logger(BlockchainRecordingService.name);

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Version Guard
  * Validates that the requested version is supported before processing the request

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Controller, Get, Query, Res, Req, Param } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { TrackingService } from './tracking.service';

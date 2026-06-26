@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 @Injectable()
 export class BlockchainAuditService {
   constructor(

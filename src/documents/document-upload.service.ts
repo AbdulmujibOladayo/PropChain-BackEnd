@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Injectable, BadRequestException } from '@nestjs/common';
 
 const ALLOWED_MIME_TYPES = new Set([

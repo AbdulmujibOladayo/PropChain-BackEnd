@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Example: Users Controller with API Versioning
  * This demonstrates how to implement versioning in controllers

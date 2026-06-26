@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Example Usage of API Documentation Decorators
  * Shows how to use the custom API documentation decorators

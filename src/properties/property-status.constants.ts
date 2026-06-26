@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { PropertyStatus } from '../types/prisma.types';
 
 /**

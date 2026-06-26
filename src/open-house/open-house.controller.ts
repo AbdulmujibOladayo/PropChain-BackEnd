@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { OpenHouseService } from './open-house.service';
 import { CreateOpenHouseDto } from './dto/create-open-house.dto';

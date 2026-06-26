@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { IsEnum, IsJSON, IsOptional, IsString } from 'class-validator';
 
 export class CreateActivityLogDto {

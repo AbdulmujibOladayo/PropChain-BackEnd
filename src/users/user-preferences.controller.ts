@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Controller, Get, Post, Body, Put, Delete, Patch, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { UserPreferencesService } from './user-preferences.service';

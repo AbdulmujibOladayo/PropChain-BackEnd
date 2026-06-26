@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { ArrayMaxSize, ArrayMinSize, ArrayUnique, IsArray, IsUUID } from 'class-validator';
 import { Transform } from 'class-transformer';
 

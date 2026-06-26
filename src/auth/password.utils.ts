@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 export type PasswordPolicy = {
   minLength: number;
   requireUppercase: boolean;

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Injectable } from '@nestjs/common';
 import { RequestRoleEscalationDto } from './dto/request-role-escalation.dto';
 

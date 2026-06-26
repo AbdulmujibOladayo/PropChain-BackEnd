@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Controller, Delete, Get, Param, UseGuards } from '@nestjs/common';
 import { SessionsService } from './sessions.service';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';

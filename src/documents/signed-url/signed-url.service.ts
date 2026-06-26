@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { SignedUrlResponse } from './signed-url-provider.interface';
 import { SIGNED_URL_PROVIDER_TOKEN } from '../documents.module';

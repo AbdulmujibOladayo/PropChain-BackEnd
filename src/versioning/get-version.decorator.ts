@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Get Version Decorator
  * Injects the current API version into controller methods

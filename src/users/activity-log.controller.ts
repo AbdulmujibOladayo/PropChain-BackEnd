@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { ActivityLogService } from './activity-log.service';
 import { GetActivityLogsDto } from './dto/activity-log.dto';

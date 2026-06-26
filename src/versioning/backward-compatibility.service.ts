@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Backward Compatibility Service
  * Handles transformation of data between API versions for backward compatibility

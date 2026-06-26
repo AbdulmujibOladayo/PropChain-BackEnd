@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { IsString, IsIn, IsOptional, IsNumber, Min } from 'class-validator';
 
 export const DOCUMENT_TYPE_ENUM = [

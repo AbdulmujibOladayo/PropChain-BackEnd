@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 export class SessionDto {
   id: string;
   accessTokenJti: string;

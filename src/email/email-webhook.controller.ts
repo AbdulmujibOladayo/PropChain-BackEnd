@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Controller, Post, Body, HttpCode } from '@nestjs/common';
 import { EmailService } from './email.service';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';

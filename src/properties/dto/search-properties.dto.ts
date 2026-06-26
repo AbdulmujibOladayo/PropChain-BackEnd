@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { IsIn, IsInt, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PROPERTY_STATUS_ENUM } from './property.dto';

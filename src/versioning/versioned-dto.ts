@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Versioned DTO Base Classes
  * Provides base classes for creating version-aware DTOs

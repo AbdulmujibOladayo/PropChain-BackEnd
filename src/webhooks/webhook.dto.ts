@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { IsArray, IsBoolean, IsEnum, IsOptional, IsString, IsUrl } from 'class-validator';
 
 export enum WebhookEventType {

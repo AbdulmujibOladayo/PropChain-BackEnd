@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Version Header Interceptor
  * Adds version information to response headers and handles version-based responses

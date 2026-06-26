@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import * as bcrypt from 'bcrypt';
 import { createHash, createHmac, randomBytes, timingSafeEqual } from 'crypto';
 

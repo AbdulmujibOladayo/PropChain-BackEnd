@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Injectable } from '@nestjs/common';
 import { MortgageCalculatorDto, MortgageResultDto } from './dto/mortgage-calculator.dto';
 

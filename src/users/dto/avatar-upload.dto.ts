@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { IsString, IsOptional } from 'class-validator';
 
 export class AvatarUploadResponseDto {

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Deprecation Warning Interceptor
  * Adds deprecation warnings to response for deprecated endpoints

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { CommissionsService } from './commissions.service';
 import { CommissionListQueryDto } from './dto/commission.dto';

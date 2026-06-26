@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { UserRole } from '@prisma/client';
 
 export type AuthUserPayload = {

@@ -52,6 +52,9 @@ export class RateLimitGuard implements CanActivate {
     const endpoint = `${request.method} ${request.route?.path || request.url}`;
 
     try {
+      // Check by user if authenticated
+      // Tier defaults to 'free' as it is not included in the current JWT payload.
+      // When 'tier' is added to JwtPayload, this logic will use the actual value.
       const ip = this.getClientIp(request);
 
       if (request.user?.id) {

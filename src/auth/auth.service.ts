@@ -124,10 +124,14 @@ export class AuthService {
 
     const passwordHash = await hashPassword(data.password, this.bcryptRounds);
     const verificationToken = randomToken(32);
-    const verificationExpiresAt = new Date(Date.now() + parseDuration(
-      this.configService.get<string>('EMAIL_VERIFICATION_EXPIRES_IN') ?? '24h',
-      24 * 60 * 60,
-    ) * 1000);
+    const verificationExpiresAt = new Date(
+      Date.now() +
+        parseDuration(
+          this.configService.get<string>('EMAIL_VERIFICATION_EXPIRES_IN') ?? '24h',
+          24 * 60 * 60,
+        ) *
+          1000,
+    );
 
     const user = await this.prisma.user.create({
       data: {
@@ -168,13 +172,17 @@ export class AuthService {
 
   /**
    * Performs mandatory security checks before validating credentials.
-   * 
+   *
    * Ordering Contract:
    * 1. Lockout check: Prevent any further action if account is temporarily locked.
    * 2. CAPTCHA check: If failed attempts exceed threshold, require CAPTCHA to proceed.
    * 3. Credentials check: (Performed in the main login method after preflight)
    */
-  private async preflightChecks(data: LoginDto, ipAddress?: string, userAgent?: string): Promise<void> {
+  private async preflightChecks(
+    data: LoginDto,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<void> {
     // Check if account is locked out
     const isLocked = await this.rateLimitService.isAccountLocked(data.email);
     if (isLocked) {
@@ -1245,6 +1253,10 @@ export class AuthService {
     });
   }
 
+  /**
+   * Generate a new API key value with 'pc_' prefix and 24 random characters.
+   * Format: pc_<24-char-random-hex>
+   */
   private generateApiKeyValue() {
     return `pc_${randomToken(24)}`;
   }

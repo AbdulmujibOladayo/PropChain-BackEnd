@@ -80,7 +80,6 @@ import { AuditModule } from './audit/audit.module';
     FavoritesModule,
     PropertyViewsModule,
     PropertyComparisonModule,
-    // NeighborhoodsModule,
     OpenHouseModule,
     MortgageCalculatorModule,
     SupportTicketsModule,

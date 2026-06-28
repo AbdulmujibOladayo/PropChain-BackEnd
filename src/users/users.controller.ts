@@ -6,6 +6,8 @@ import {
   Delete,
   ForbiddenException,
   Get,
+  GoneException,
+  HttpException,
   HttpStatus,
   InternalServerErrorException,
   NotFoundException,
@@ -27,6 +29,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthUserPayload } from '../auth/types/auth-user.type';
 import { UserRole } from '../types/prisma.types';
 import { UsersService } from './users.service';
+import { ActivityLogService } from './activity-log.service';
 import {
   CreateUserDto,
   SearchUsersDto,
@@ -41,7 +44,10 @@ const UNAUTHORIZED_ACTION_MESSAGE = 'You are not authorized to perform this acti
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly activityLogService: ActivityLogService,
+  ) {}
 
   // ─── Admin Endpoints ─────────────────────────────────────────────
 
@@ -167,11 +173,25 @@ export class UsersController {
       throw new NotFoundException('Export file not found');
     }
 
+    const stats = fs.statSync(filepath);
+    const expirationTime = 24 * 60 * 60 * 1000;
+    if (Date.now() - stats.mtimeMs > expirationTime) {
+      throw new GoneException('Export file has expired');
+    }
+
     const ownerId = this.extractExportOwnerId(filename);
 
     if (user.sub !== ownerId && user.role !== UserRole.ADMIN) {
       throw new ForbiddenException(UNAUTHORIZED_ACTION_MESSAGE);
     }
+
+    this.activityLogService.create(user.sub, {
+      action: 'EXPORT_DOWNLOAD',
+      entityType: 'USER',
+      entityId: ownerId,
+      description: `Downloaded export file: ${filename}`,
+      metadata: { filename, ownerId },
+    });
 
     res.download(filepath, (err) => {
       if (err && !res.headersSent) {

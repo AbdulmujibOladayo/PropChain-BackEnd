@@ -36,6 +36,7 @@ import {
   parseDuration,
   randomBase32Secret,
   randomToken,
+  redactEmail,
   sanitizeUser,
   verifyBackupCode,
   verifyTotpCode,

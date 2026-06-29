@@ -477,7 +477,7 @@ export class UsersService implements OnModuleInit {
     });
 
     this.logger.log(
-      `User ${userId} (${user.email}) deactivated. Scheduled deletion: ${scheduledDeletionAt ? scheduledDeletionAt.toISOString() : 'None'}`,
+      `User ${userId} (${redactEmail(user.email)}) deactivated. Scheduled deletion: ${scheduledDeletionAt ? scheduledDeletionAt.toISOString() : 'None'}`,
     );
 
     await this.sessionsService.revokeAllSessions(userId);
@@ -577,7 +577,17 @@ export class UsersService implements OnModuleInit {
       },
     });
 
-    this.logger.log(`User ${userId} (${user.email}) reactivated`);
+    await this.prisma.activityLog.create({
+      data: {
+        userId,
+        action: 'REACTIVATE',
+        entityType: 'USER',
+        entityId: userId,
+        description: `Account reactivated`,
+      },
+    });
+
+    this.logger.log(`User ${userId} (${redactEmail(user.email)}) reactivated`);
 
     return updatedUser;
   }

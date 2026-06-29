@@ -64,6 +64,8 @@ export class AuthService {
   private readonly logger = new Logger(AuthService.name);
   private readonly issuer = 'PropChain';
 
+  private readonly registrationIpMap = new Map<string, { email: string; expiresAt: Date }>();
+
   private hashEmail(email: string): string {
     const debugPii = this.configService.get<string>('DEBUG_PII') === 'true';
     if (debugPii) {
@@ -114,7 +116,17 @@ export class AuthService {
     }));
   }
 
-  async register(data: RegisterDto) {
+  async register(data: RegisterDto, ipAddress?: string) {
+    // Block re-registration from same IP until prior email is verified
+    if (ipAddress) {
+      const allowed = this.canRegisterFromIp(ipAddress);
+      if (!allowed) {
+        throw new BadRequestException(
+          'A registration from this IP is already pending email verification. Please verify your email before registering a new account.',
+        );
+      }
+    }
+
     const existingUser = await this.usersService.findByEmail(data.email);
     if (existingUser) {
       throw new BadRequestException('A user with that email already exists');
@@ -171,11 +183,44 @@ export class AuthService {
 
     // Only issue short-lived verification token after email is sent
     // Full token pair is issued in verifyInitialEmail after verification succeeds
+
+    // Track IP for re-registration prevention
+    if (ipAddress) {
+      const expiryMs =
+        parseDuration(
+          this.configService.get<string>('EMAIL_VERIFICATION_EXPIRES_IN') ?? '24h',
+          24 * 60 * 60,
+        ) * 1000;
+      this.registrationIpMap.set(ipAddress, {
+        email: user.email,
+        expiresAt: new Date(Date.now() + expiryMs),
+      });
+    }
+
     return {
       user: sanitizeUser(user),
       message: 'Registration successful. Please check your email to verify your account.',
       verificationToken,
     };
+  }
+
+  private canRegisterFromIp(ipAddress: string): boolean {
+    const entry = this.registrationIpMap.get(ipAddress);
+    if (!entry) return true;
+    if (Date.now() > entry.expiresAt.getTime()) {
+      this.registrationIpMap.delete(ipAddress);
+      return true;
+    }
+    return false;
+  }
+
+  private cleanupIpForEmail(email: string): void {
+    for (const [ip, entry] of this.registrationIpMap.entries()) {
+      if (entry.email === email) {
+        this.registrationIpMap.delete(ip);
+        return;
+      }
+    }
   }
 
   /**

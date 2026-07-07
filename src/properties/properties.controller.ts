@@ -167,6 +167,8 @@ export class PropertiesController {
     return this.propertiesService.rejectProperty(id, user.sub);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Post('bulk/status')
   async bulkUpdatePropertyStatus(
     @Body() body: BulkPropertyStatusUpdateDto,
@@ -175,6 +177,8 @@ export class PropertiesController {
     return this.propertiesService.bulkUpdatePropertyStatus(body.propertyIds, body.status);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Post('bulk/delete')
   async bulkDeleteProperties(
     @Body() body: BulkPropertyDeleteDto,
@@ -183,6 +187,8 @@ export class PropertiesController {
     return this.propertiesService.bulkDeleteProperties(body.propertyIds);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Post('bulk/export')
   async bulkExportProperties(
     @Body() body: BulkPropertyExportDto,

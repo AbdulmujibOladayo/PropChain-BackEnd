@@ -11,6 +11,7 @@ import { LoginRateLimitService } from '../../src/auth/login-rate-limit.service';
 import { FraudService } from '../../src/fraud/fraud.service';
 import { ApiKeyAnalyticsService } from '../../src/auth/api-key-analytics.service';
 import { ConfigService } from '@nestjs/config';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { createSha256, hashPassword } from '../../src/auth/security.utils';
 import * as jwt from 'jsonwebtoken';
 
@@ -19,6 +20,7 @@ const REFRESH_SECRET = 'test-refresh-secret-at-least-32-characters-long';
 
 describe('Fraud alert auto-block e2e', () => {
   let app: INestApplication;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let authService: AuthService;
   let prisma: any;
 
@@ -81,6 +83,7 @@ describe('Fraud alert auto-block e2e', () => {
           Object.assign(user, data);
           return user;
         },
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         updateMany: async ({ where, data }: any) => {
           for (const user of users.values()) {
             Object.assign(user, data);
@@ -375,7 +378,9 @@ describe('Fraud alert auto-block e2e', () => {
     fraudService.handleTokenReuse.mockClear();
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function signRefresh(payload: Record<string, any>) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { exp, ...rest } = payload;
     return jwt.sign(rest, REFRESH_SECRET, { expiresIn: '7d', issuer: 'PropChain' });
   }

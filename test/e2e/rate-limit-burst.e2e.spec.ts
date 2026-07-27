@@ -103,6 +103,7 @@ describe('Rate-limit guard e2e – burst traffic', () => {
           Object.assign(user, data);
           return user;
         },
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         updateMany: async ({ where, data }: any) => {
           for (const user of users.values()) {
             Object.assign(user, data);

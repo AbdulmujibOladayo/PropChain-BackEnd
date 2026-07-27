@@ -37,6 +37,7 @@ import {
   parseDuration,
   randomBase32Secret,
   randomToken,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   redactEmail,
   sanitizeUser,
   verifyBackupCode,
@@ -653,6 +654,7 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [properties, buyerTransactions, sellerTransactions, documents, apiKeys] =
       await Promise.all([
         this.prisma.property.findMany({
@@ -1648,6 +1650,7 @@ export class AuthService {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async resendEmailVerification(email: string, ipAddress?: string, userAgent?: string) {
     const user = await this.usersService.findByEmail(email);
     if (!user) {

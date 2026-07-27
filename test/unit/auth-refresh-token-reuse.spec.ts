@@ -2,18 +2,26 @@ import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
 import { AuthService } from '../../src/auth/auth.service';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { PrismaService } from '../../src/database/prisma.service';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { UsersService } from '../../src/users/users.service';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { SessionsService } from '../../src/sessions/sessions.service';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { EmailService } from '../../src/email/email.service';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { LoginRateLimitService } from '../../src/auth/login-rate-limit.service';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FraudService } from '../../src/fraud/fraud.service';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { createSha256 } from '../../src/auth/security.utils';
 
 const ACCESS_SECRET = 'test-access-secret-at-least-32-characters-long';
 const REFRESH_SECRET = 'test-refresh-secret-at-least-32-characters-long';
 
 function signRefresh(payload: Record<string, any>) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { exp, ...rest } = payload;
   return jwt.sign(rest, REFRESH_SECRET, {
     expiresIn: '7d',

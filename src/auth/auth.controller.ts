@@ -20,7 +20,6 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ApiKeyAuthGuard } from './guards/api-key-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
-import { RateLimitGuard } from './guards/rate-limit.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { Roles } from './decorators/roles.decorator';
 import { AuthUserPayload } from './types/auth-user.type';
@@ -175,15 +174,13 @@ export class AuthController {
   }
 
   @Post('password-reset/request')
-  requestPasswordReset(@Body() requestPasswordResetDto: RequestPasswordResetDto, @Req() request: Request) {
-    const ipAddress = request.ip || request.socket.remoteAddress;
-    return this.authService.requestPasswordReset(requestPasswordResetDto, ipAddress);
+  requestPasswordReset(@Body() requestPasswordResetDto: RequestPasswordResetDto) {
+    return this.authService.requestPasswordReset(requestPasswordResetDto);
   }
 
   @Post('password-reset/reset')
-  resetPassword(@Body() resetPasswordDto: ResetPasswordDto, @Req() request: Request) {
-    const ipAddress = request.ip || request.socket.remoteAddress;
-    return this.authService.resetPassword(resetPasswordDto, ipAddress);
+  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(resetPasswordDto);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

@@ -13,6 +13,10 @@ import { RateLimitHeadersInterceptor } from './auth/interceptors/rate-limit-head
 import { ResponseFormatInterceptor } from './common/interceptors/response-format.interceptor';
 import { setupSwagger } from './config/swagger.config';
 import { validateEnvironment } from './utils/validate-env';
+// Import our exception filters
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter';
 
 async function bootstrap() {
   validateEnvironment();

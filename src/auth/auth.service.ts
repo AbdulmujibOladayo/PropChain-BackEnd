@@ -47,8 +47,11 @@ import { AuthUserPayload } from './types/auth-user.type';
 import { GoogleProfile } from './strategies/google.strategy';
 
 import { LoginRateLimitService } from './login-rate-limit.service';
+import { RateLimitService } from './rate-limit.service';
 import { UserRole } from '../types/prisma.types';
 import { FraudService } from '../fraud/fraud.service';
+import { ENDPOINT_RATE_LIMITS } from './rate-limit.config';
+import { CacheService } from '../cache/cache.service';
 import { ApiKeyAnalyticsService } from './api-key-analytics.service';
 
 type JwtPayload = {
@@ -88,8 +91,10 @@ export class AuthService {
     private readonly sessionsService: SessionsService,
     private readonly configService: ConfigService,
     private readonly emailService: EmailService,
-    private readonly rateLimitService: LoginRateLimitService,
+    private readonly loginRateLimitService: LoginRateLimitService,
+    private readonly rateLimitService: RateLimitService,
     private readonly fraudService: FraudService,
+    private readonly cacheService: CacheService,
     @Optional() private readonly apiKeyAnalyticsService?: ApiKeyAnalyticsService,
   ) {
     this.jwtSecret = this.configService.get<string>('JWT_SECRET') ?? 'propchain-access-secret';
@@ -122,7 +127,7 @@ export class AuthService {
   async register(data: RegisterDto, ipAddress?: string) {
     // Block re-registration from same IP until prior email is verified
     if (ipAddress) {
-      const allowed = this.canRegisterFromIp(ipAddress);
+      const allowed = await this.canRegisterFromIp(ipAddress);
       if (!allowed) {
         throw new BadRequestException(
           'A registration from this IP is already pending email verification. Please verify your email before registering a new account.',
@@ -189,15 +194,23 @@ export class AuthService {
 
     // Track IP for re-registration prevention
     if (ipAddress) {
-      const expiryMs =
+      const expirySeconds =
         parseDuration(
           this.configService.get<string>('EMAIL_VERIFICATION_EXPIRES_IN') ?? '24h',
           24 * 60 * 60,
-        ) * 1000;
-      this.registrationIpMap.set(ipAddress, {
+        );
+      const expiryMs = expirySeconds * 1000;
+      const cacheKey = `registration:ip:${ipAddress}`;
+      const entry = {
         email: user.email,
         expiresAt: new Date(Date.now() + expiryMs),
-      });
+      };
+      
+      // Store in Redis with TTL
+      await this.cacheService.set(cacheKey, entry, expirySeconds);
+      
+      // Also keep in in-memory map for backward compatibility/fallback
+      this.registrationIpMap.set(ipAddress, entry);
     }
 
     return {
@@ -207,22 +220,44 @@ export class AuthService {
     };
   }
 
-  private canRegisterFromIp(ipAddress: string): boolean {
-    const entry = this.registrationIpMap.get(ipAddress);
-    if (!entry) return true;
-    if (Date.now() > entry.expiresAt.getTime()) {
+  private async canRegisterFromIp(ipAddress: string): Promise<boolean> {
+    const cacheKey = `registration:ip:${ipAddress}`;
+    const entry = await this.cacheService.get<{ email: string; expiresAt: Date }>(cacheKey);
+    
+    // Check cache first
+    if (entry) {
+      if (Date.now() > entry.expiresAt.getTime()) {
+        await this.cacheService.del(cacheKey);
+        return true;
+      }
+      return false;
+    }
+    
+    // Fallback to in-memory map for backward compatibility
+    const inMemoryEntry = this.registrationIpMap.get(ipAddress);
+    if (!inMemoryEntry) return true;
+    if (Date.now() > inMemoryEntry.expiresAt.getTime()) {
       this.registrationIpMap.delete(ipAddress);
       return true;
     }
     return false;
   }
 
-  private cleanupIpForEmail(email: string): void {
+  private async cleanupIpForEmail(email: string): Promise<void> {
+    // First check in-memory map to find the IP for this email
+    let ipToCleanup: string | null = null;
     for (const [ip, entry] of this.registrationIpMap.entries()) {
       if (entry.email === email) {
         this.registrationIpMap.delete(ip);
-        return;
+        ipToCleanup = ip;
+        break;
       }
+    }
+    
+    // Also delete from Redis if we found the IP, or scan for it
+    if (ipToCleanup) {
+      const cacheKey = `registration:ip:${ipToCleanup}`;
+      await this.cacheService.del(cacheKey);
     }
   }
 
@@ -1374,7 +1409,23 @@ export class AuthService {
     return Array.from(new Set(permissions.map((permission) => permission.trim()).filter(Boolean)));
   }
 
-  async requestPasswordReset(data: RequestPasswordResetDto): Promise<void> {
+  async requestPasswordReset(data: RequestPasswordResetDto, ipAddress?: string): Promise<void> {
+    // Apply rate limiting: max 3 requests per email per hour
+    const emailRateLimit = await this.rateLimitService.checkEmailRateLimit(
+      'POST /auth/password-reset/request',
+      data.email,
+      3,
+      60 * 60 * 1000, // 1 hour
+    );
+
+    if (emailRateLimit.isExceeded) {
+      this.logger.warn(
+        `Password reset request rate limit exceeded for email: ${redactEmail(data.email)} (IP: ${ipAddress || 'unknown'})`,
+      );
+      // Don't reveal rate limit was exceeded to prevent user enumeration
+      return;
+    }
+
     const user = await this.usersService.findByEmail(data.email);
     if (!user) {
       // Don't reveal if email exists or not for security
@@ -1415,7 +1466,22 @@ export class AuthService {
     await this.emailService.sendPasswordResetEmail(user.email, resetToken);
   }
 
-  async resetPassword(data: ResetPasswordDto): Promise<void> {
+  async resetPassword(data: ResetPasswordDto, ipAddress?: string): Promise<void> {
+    // Apply rate limiting: max 5 attempts per token per hour
+    const tokenRateLimit = await this.rateLimitService.checkTokenRateLimit(
+      'POST /auth/password-reset/reset',
+      data.token,
+      5,
+      60 * 60 * 1000, // 1 hour
+    );
+
+    if (tokenRateLimit.isExceeded) {
+      this.logger.warn(
+        `Password reset token rate limit exceeded. Token: ${data.token.substring(0, 8)}... (IP: ${ipAddress || 'unknown'})`,
+      );
+      throw new BadRequestException('Too many attempts. Please try again later.');
+    }
+
     const tokenHash = createSha256(data.token);
     const resetToken = await this.prisma.passwordResetToken.findUnique({
       where: { token: tokenHash },
@@ -1585,6 +1651,21 @@ export class AuthService {
   }
 
   async verifyInitialEmail(token: string, ipAddress?: string, userAgent?: string) {
+    // Apply rate limiting: max 5 attempts per token per hour
+    const tokenRateLimit = await this.rateLimitService.checkTokenRateLimit(
+      'POST /auth/verify-email',
+      token,
+      5,
+      60 * 60 * 1000, // 1 hour
+    );
+
+    if (tokenRateLimit.isExceeded) {
+      this.logger.warn(
+        `Email verification token rate limit exceeded. Token: ${token.substring(0, 8)}... (IP: ${ipAddress || 'unknown'})`,
+      );
+      throw new BadRequestException('Too many attempts. Please try again later.');
+    }
+
     // Find user by verification token
     const user = await this.prisma.user.findFirst({
       where: {
@@ -1624,6 +1705,9 @@ export class AuthService {
       },
     });
 
+    // Clean up IP tracking since email is now verified
+    await this.cleanupIpForEmail(user.email);
+    
     // Issue token pair
     const tokens = await this.issueTokenPair(updatedUser, undefined, ipAddress, userAgent);
 
@@ -1635,6 +1719,22 @@ export class AuthService {
   }
 
   async resendEmailVerification(email: string, ipAddress?: string, userAgent?: string) {
+    // Apply rate limiting: max 3 requests per email per hour
+    const emailRateLimit = await this.rateLimitService.checkEmailRateLimit(
+      'POST /auth/email/resend',
+      email,
+      3,
+      60 * 60 * 1000, // 1 hour
+    );
+
+    if (emailRateLimit.isExceeded) {
+      this.logger.warn(
+        `Email resend rate limit exceeded for email: ${redactEmail(email)} (IP: ${ipAddress || 'unknown'})`,
+      );
+      // Don't reveal rate limit was exceeded to prevent user enumeration
+      return;
+    }
+
     const user = await this.usersService.findByEmail(email);
     if (!user) {
       return;

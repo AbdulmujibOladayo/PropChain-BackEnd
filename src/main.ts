@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe, BadRequestException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
@@ -13,6 +11,7 @@ import { RateLimitHeadersInterceptor } from './auth/interceptors/rate-limit-head
 import { ResponseFormatInterceptor } from './common/interceptors/response-format.interceptor';
 import { setupSwagger } from './config/swagger.config';
 import { validateEnvironment } from './utils/validate-env';
+import { TraceInterceptor } from './tracing/trace.interceptor';
 // Issue #964 – exception filters are registered globally via APP_FILTER
 // providers in AppModule. We deliberately do NOT call useGlobalFilters here
 // to avoid registering the same filter twice.
@@ -35,6 +34,40 @@ async function bootstrap() {
   }
 
   const app = await NestFactory.create(AppModule);
+
+  // CORS configuration
+  const corsOrigins = process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',').map((origin) => origin.trim())
+    : ['http://localhost:3000'];
+
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  if (isProduction && corsOrigins.includes('*')) {
+    logger.warn('Wildcard CORS origins are not allowed in production. Using default origins.');
+    corsOrigins.length = 0;
+    corsOrigins.push('http://localhost:3000');
+  }
+
+  app.enableCors({
+    origin: corsOrigins,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'API-Version', 'api-key'],
+  });
+
+  // Security headers middleware
+  app.use((req: any, res: any, next: any) => {
+    res.setHeader(
+      'Content-Security-Policy',
+      "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'",
+    );
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    next();
+  });
 
   // Issue #964 – Localize validation error messages via the I18nService.
   const { I18nService } = await import('./i18n/i18n.service');
@@ -71,6 +104,7 @@ async function bootstrap() {
     deprecationWarningInterceptor,
     cacheMetricsInterceptor,
     rateLimitHeadersInterceptor,
+    new TraceInterceptor(),
   );
 
   // Issue #964 – Exception filters are registered globally via APP_FILTER
@@ -81,7 +115,7 @@ async function bootstrap() {
   // Register global guards
   const reflector = app.get(Reflector);
   const rateLimitService = app.get(RateLimitService);
-  app.useGlobalGuards(new RateLimitGuard(rateLimitService, reflector));
+  app.useGlobalGuards(new RateLimitGuard(reflector, rateLimitService));
 
   // Setup Swagger documentation
   setupSwagger(app);

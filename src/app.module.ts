@@ -59,7 +59,6 @@ import { APP_FILTER } from '@nestjs/core';
       isGlobal: true,
       envFilePath: ['.env.local', '.env'],
     }),
-
     ScheduleModule.forRoot(),
     CacheModuleConfig,
     AnalyticsModule,

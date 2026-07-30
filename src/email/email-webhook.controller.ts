@@ -12,15 +12,25 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { AuthUserPayload } from '../auth/types/auth-user.type';
 import { UserRole } from '../types/prisma.types';
 
-@ApiTags('Email')
-@Controller('email')
+interface EmailBouncePayload {
+  email?: string;
+  recipient?: string;
+  type?: string;
+  bounceType?: string;
+  reason?: string;
+  diagnosticCode?: string;
+}
+
+@ApiTags('webhooks')
+@Controller('webhooks/email')
 export class EmailWebhookController {
   constructor(private emailService: EmailService) {}
 
   @Post('webhook/bounce')
   @HttpCode(200)
-  @ApiOperation({ summary: 'Handle email bounce/complaint webhooks' })
-  async handleBounce(@Body() payload: any) {
+  @ApiOperation({ summary: 'Handle email bounce webhooks' })
+  async handleBounce(@Body() payload: EmailBouncePayload) {
+    // Basic extraction logic - in a real app, this would be provider-specific
     const email = payload.email || payload.recipient;
     const type = payload.type || (payload.bounceType === 'Hard' ? 'HARD' : 'SOFT');
     const reason = payload.reason || payload.diagnosticCode;

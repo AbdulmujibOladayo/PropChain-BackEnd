@@ -7,6 +7,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { AuthUserPayload } from '../auth/types/auth-user.type';
 import { UserRole, UserTier } from '../types/prisma.types';
 import { Response } from 'express';
+import { RequestSignedUploadDto } from './dto/document-access.dto';
 
 describe('DocumentsDownloadController', () => {
   let controller: DocumentsDownloadController;
@@ -125,11 +126,11 @@ describe('DocumentsDownloadController', () => {
   });
 
   describe('Upload URL Endpoints', () => {
-    const uploadDto = {
-      fileName: 'test.pdf',
-      mimeType: 'application/pdf',
-      fileSizeBytes: 1024,
-    } as any;
+    const uploadDto = { 
+      fileName: 'test.pdf', 
+      mimeType: 'application/pdf', 
+      fileSizeBytes: 1024 
+    } as RequestSignedUploadDto;
 
     const mockSignedUrlResponse = {
       url: 'http://signed.url/upload',
@@ -187,7 +188,7 @@ describe('DocumentsDownloadController', () => {
 
   describe('createMetadata', () => {
     it('should pass the DTO and user ID to the documents service', async () => {
-      const mockDto = { fileName: 'test.pdf' };
+      const mockDto = { fileName: 'test.pdf', documentType: 'OTHER', fileUrl: 'https://example.com/test.pdf' };
       mockDocumentsService.create.mockResolvedValue({ id: 'doc-123' });
 
       const result = await controller.createMetadata(mockDto, mockUser);

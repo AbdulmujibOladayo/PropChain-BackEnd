@@ -8,6 +8,20 @@ import { GeoLocationService } from './geo-location.service';
 import { DeviceFingerprintService } from './device-fingerprint.service';
 import { FraudPattern, FraudSeverity } from '../types/prisma.types';
 
+// FraudService's AlertPayload type and private detection helpers aren't exported;
+// this describes just enough shape to call them from tests without `any`.
+interface FraudServiceInternals {
+  createOrUpdateAlert(payload: Record<string, unknown>): Promise<{ id: string } | null>;
+  findOpenAlert(payload: Record<string, unknown>): Promise<unknown>;
+  notifySecurityTeam(alert: unknown, isUpdate?: boolean): Promise<void>;
+  blockUserForFraud(
+    userId: string,
+    alertId: string,
+    actorId: string,
+    reason: string,
+  ): Promise<void>;
+}
+
 describe('FraudService', () => {
   let service: FraudService;
 
@@ -47,11 +61,11 @@ describe('FraudService', () => {
       findFirst: jest.fn(),
       findMany: jest.fn(),
     },
-  } as any;
+  };
 
   const mockEmailService = {
     sendFraudAlertEmail: jest.fn(),
-  } as any;
+  };
 
   const mockConfigService = {
     get: jest.fn((key: string) => {
@@ -61,7 +75,7 @@ describe('FraudService', () => {
 
       return undefined;
     }),
-  } as any;
+  };
 
   const mockGeoLocationService = {
     extractIp: jest.fn().mockReturnValue('203.0.113.42'),
@@ -114,7 +128,7 @@ describe('FraudService', () => {
     mockPrismaService.loginAttempt.count.mockResolvedValue(6);
 
     const createOrUpdateAlertSpy = jest
-      .spyOn(service as any, 'createOrUpdateAlert')
+      .spyOn(service as unknown as FraudServiceInternals, 'createOrUpdateAlert')
       .mockResolvedValue({ id: 'alert-1' });
 
     const result = await service.evaluateFailedLogin('user@example.com', '10.0.0.1', 'Mozilla');
@@ -155,8 +169,8 @@ describe('FraudService', () => {
     ]);
 
     const createOrUpdateAlertSpy = jest
-      .spyOn(service as any, 'createOrUpdateAlert')
-      .mockImplementation(async (payload: any) => payload);
+      .spyOn(service as unknown as FraudServiceInternals, 'createOrUpdateAlert')
+      .mockImplementation(async (payload: Record<string, unknown>) => payload as { id: string });
 
     const alerts = await service.evaluatePropertyCreated('property-1');
 
@@ -182,10 +196,10 @@ describe('FraudService', () => {
   });
 
   it('auto-blocks a user when a critical alert is created with enforcement enabled', async () => {
-    jest.spyOn(service as any, 'findOpenAlert').mockResolvedValue(null);
-    jest.spyOn(service as any, 'notifySecurityTeam').mockResolvedValue(undefined);
+    jest.spyOn(service as unknown as FraudServiceInternals, 'findOpenAlert').mockResolvedValue(null);
+    jest.spyOn(service as unknown as FraudServiceInternals, 'notifySecurityTeam').mockResolvedValue(undefined);
     const blockUserForFraudSpy = jest
-      .spyOn(service as any, 'blockUserForFraud')
+      .spyOn(service as unknown as FraudServiceInternals, 'blockUserForFraud')
       .mockResolvedValue(undefined);
 
     mockPrismaService.fraudAlert.create.mockResolvedValue({
@@ -200,7 +214,7 @@ describe('FraudService', () => {
       },
     });
 
-    await (service as any).createOrUpdateAlert({
+    await (service as unknown as FraudServiceInternals).createOrUpdateAlert({
       userId: 'user-1',
       pattern: FraudPattern.TOKEN_REUSE,
       severity: FraudSeverity.CRITICAL,

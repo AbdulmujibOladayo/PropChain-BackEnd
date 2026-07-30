@@ -10,6 +10,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Request } from 'express';
 import { RateLimitService } from '../rate-limit.service';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { RATE_LIMIT_HEADERS } from '../rate-limit.config';
@@ -159,7 +160,7 @@ export class RateLimitGuard implements CanActivate {
   /**
    * Extract client IP from request
    */
-  private getClientIp(request: any): string {
+  private getClientIp(request: Request): string {
     return (
       request.headers['x-forwarded-for']?.split(',')[0].trim() ||
       request.connection?.remoteAddress ||

@@ -2,6 +2,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { WebhooksService } from './webhooks.service';
 import { PrismaService } from '../database/prisma.service';
+import { CreateWebhookDto } from './webhook.dto';
 
 describe('WebhooksService', () => {
   let service: WebhooksService;
@@ -34,25 +35,34 @@ describe('WebhooksService', () => {
   });
 
   describe('create', () => {
-    it('should create a webhook', async () => {
-      const dto = {
+    it('creates a webhook and returns it with the plaintext secret', async () => {
+      const dto: CreateWebhookDto = {
         url: 'https://example.com/hook',
-        eventTypes: ['property.created'] as any,
-        secret: 'test-secret',
-      };
+        eventTypes: ['transaction.created'],
+        description: 'test webhook',
+      } as CreateWebhookDto;
+
       prisma.webhook.create.mockResolvedValue({
         id: 'wh-1',
         userId: 'user-1',
         url: dto.url,
-        eventTypes: dto.eventTypes,
-        secret: dto.secret,
-        status: 'ACTIVE',
-        createdAt: new Date(),
+        secret: 'stored-secret',
+        events: dto.eventTypes,
+        description: dto.description,
       });
 
       const result = await service.create('user-1', dto);
-      expect(result).toBeDefined();
-      expect(prisma.webhook.create).toHaveBeenCalled();
+
+      expect(prisma.webhook.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          userId: 'user-1',
+          url: dto.url,
+          events: dto.eventTypes,
+          description: dto.description,
+          secret: expect.any(String),
+        }),
+      });
+      expect(result).toHaveProperty('secret');
     });
   });
 

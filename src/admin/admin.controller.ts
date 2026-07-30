@@ -256,11 +256,7 @@ export class AdminController {
   }
 
   @Get('email/preview/:templateName')
-  async previewEmailTemplate(@Param('templateName') templateName: string): Promise<{
-    templateName: string;
-    sampleData: Record<string, unknown>;
-    note: string;
-  }> {
+  async previewEmailTemplate(@Param('templateName') templateName: string) {
     const sampleDataMap: Record<string, Record<string, unknown>> = {
       'password-reset': {
         resetUrl: 'http://localhost:3000/reset-password?token=sample-token-123',

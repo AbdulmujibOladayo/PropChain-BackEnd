@@ -194,7 +194,7 @@ export class DashboardService {
         take: limit,
       });
 
-      return recommendations.map((prop: any) => ({
+      return recommendations.map((prop) => ({
         id: prop.id,
         title: prop.title,
         address: prop.address,
@@ -213,7 +213,7 @@ export class DashboardService {
       where: {
         status: 'ACTIVE',
         ownerId: { not: userId },
-        OR: userProperties.map((prop: any) => ({
+        OR: userProperties.map((prop) => ({
           AND: [
             { city: prop.city },
             { state: prop.state },
@@ -225,7 +225,7 @@ export class DashboardService {
       take: limit,
     });
 
-    return similarProperties.map((prop: any) => ({
+    return similarProperties.map((prop) => ({
       id: prop.id,
       title: prop.title,
       address: prop.address,

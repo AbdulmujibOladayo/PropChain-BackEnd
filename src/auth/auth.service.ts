@@ -7,7 +7,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Prisma } from '@prisma/client';
+import { Prisma, BlacklistedToken, Document, ApiKey, PasswordHistory } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import * as jwt from 'jsonwebtoken';
 import { PrismaService } from '../database/prisma.service';
@@ -62,6 +62,23 @@ type JwtPayload = {
   family?: string;
   exp?: number;
 };
+
+type TransactionWithPropertyTitle = Prisma.TransactionGetPayload<{
+  include: { property: { select: { title: true } } };
+}>;
+
+type PropertyWithOwnerName = Prisma.PropertyGetPayload<{
+  include: { owner: { select: { firstName: true; lastName: true } } };
+}>;
+
+interface RecaptchaVerifyResponse {
+  success: boolean;
+  score?: number;
+  action?: string;
+  challenge_ts?: string;
+  hostname?: string;
+  'error-codes'?: string[];
+}
 
 @Injectable()
 export class AuthService {
@@ -123,7 +140,10 @@ export class AuthService {
   /**
    * Helper to map transactions to activity items for dashboard
    */
-  private transactionsToActivityItems(transactions: any[], type: 'purchase' | 'sale') {
+  private transactionsToActivityItems(
+    transactions: TransactionWithPropertyTitle[],
+    type: 'purchase' | 'sale',
+  ) {
     return transactions.map((tx) => ({
       type: 'transaction' as const,
       id: tx.id,
@@ -495,7 +515,7 @@ export class AuthService {
    * Handle token reuse detection - invalidate entire token family
    */
   private async handleTokenReuse(
-    blacklistedToken: any,
+    blacklistedToken: BlacklistedToken,
     reusedJti: string,
     ipAddress?: string,
     userAgent?: string,
@@ -776,7 +796,7 @@ export class AuthService {
     const recentActivity = [
       ...this.transactionsToActivityItems(buyerTransactions, 'purchase'),
       ...this.transactionsToActivityItems(sellerTransactions, 'sale'),
-      ...documents.map((doc: any) => ({
+      ...documents.map((doc: Document) => ({
         type: 'document' as const,
         id: doc.id,
         title: doc.fileName,
@@ -800,7 +820,7 @@ export class AuthService {
         apiKeysCount: apiKeys.length,
       },
       recentActivity,
-      recommendations: recommendationProperties.map((p: any) => ({
+      recommendations: recommendationProperties.map((p: PropertyWithOwnerName) => ({
         id: p.id,
         title: p.title,
         address: p.address,
@@ -1061,7 +1081,7 @@ export class AuthService {
       orderBy: { createdAt: 'desc' },
     });
 
-    return apiKeys.map((apiKey: any) => this.toApiKeyResponse(apiKey));
+    return apiKeys.map((apiKey: ApiKey) => this.toApiKeyResponse(apiKey));
   }
 
   async rotateApiKey(user: AuthUserPayload, apiKeyId: string) {
@@ -1431,7 +1451,7 @@ export class AuthService {
     return `pc_${randomToken(24)}`;
   }
 
-  private toApiKeyResponse(apiKey: any) {
+  private toApiKeyResponse(apiKey: ApiKey) {
     return {
       id: apiKey.id,
       name: apiKey.name,
@@ -1575,7 +1595,7 @@ export class AuthService {
       if (historyEntries.length > 0) {
         await tx.passwordHistory.deleteMany({
           where: {
-            id: { in: historyEntries.map((entry: any) => entry.id) },
+            id: { in: historyEntries.map((entry: PasswordHistory) => entry.id) },
           },
         });
       }
@@ -1652,7 +1672,7 @@ export class AuthService {
         body: `secret=${secret}&response=${token}`,
       });
 
-      const data = (await response.json()) as any;
+      const data = (await response.json()) as RecaptchaVerifyResponse;
 
       // reCAPTCHA v3 returns a score between 0.0 and 1.0. Typically, 0.5 is a good threshold.
       if (data.success && data.score !== undefined && data.score >= 0.5) {

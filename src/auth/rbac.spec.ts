@@ -3,13 +3,14 @@
  * Tests that USER, AGENT, and ADMIN roles are correctly enforced.
  */
 import { Test, TestingModule } from '@nestjs/testing';
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { AuthUserPayload } from '../auth/types/auth-user.type';
 import { UserRole, UserTier } from '../types/prisma.types';
+import { CreatePropertyDto } from '../properties/dto/property.dto';
 
-function makeContext(role: UserRole, requiredRoles: UserRole[] | null) {
+function makeContext(role: UserRole, requiredRoles: UserRole[] | null): ExecutionContext {
   const user: AuthUserPayload = {
     sub: 'u1',
     email: 'u@test.com',
@@ -23,7 +24,7 @@ function makeContext(role: UserRole, requiredRoles: UserRole[] | null) {
     getHandler: () => ({}),
     getClass: () => ({}),
     _requiredRoles: requiredRoles,
-  };
+  } as unknown as ExecutionContext;
 }
 
 describe('RolesGuard - RBAC enforcement', () => {
@@ -47,19 +48,19 @@ describe('RolesGuard - RBAC enforcement', () => {
     it('allows ADMIN to access admin routes', () => {
       setupRoles([UserRole.ADMIN]);
       const ctx = makeContext(UserRole.ADMIN, [UserRole.ADMIN]);
-      expect(guard.canActivate(ctx as any)).toBe(true);
+      expect(guard.canActivate(ctx)).toBe(true);
     });
 
     it('rejects USER from admin routes', () => {
       setupRoles([UserRole.ADMIN]);
       const ctx = makeContext(UserRole.USER, [UserRole.ADMIN]);
-      expect(() => guard.canActivate(ctx as any)).toThrow(ForbiddenException);
+      expect(() => guard.canActivate(ctx)).toThrow(ForbiddenException);
     });
 
     it('rejects AGENT from admin routes', () => {
       setupRoles([UserRole.ADMIN]);
       const ctx = makeContext(UserRole.AGENT, [UserRole.ADMIN]);
-      expect(() => guard.canActivate(ctx as any)).toThrow(ForbiddenException);
+      expect(() => guard.canActivate(ctx)).toThrow(ForbiddenException);
     });
   });
 
@@ -67,19 +68,19 @@ describe('RolesGuard - RBAC enforcement', () => {
     it('allows AGENT to access agent+admin routes', () => {
       setupRoles([UserRole.AGENT, UserRole.ADMIN]);
       const ctx = makeContext(UserRole.AGENT, [UserRole.AGENT, UserRole.ADMIN]);
-      expect(guard.canActivate(ctx as any)).toBe(true);
+      expect(guard.canActivate(ctx)).toBe(true);
     });
 
     it('allows ADMIN to access agent+admin routes', () => {
       setupRoles([UserRole.AGENT, UserRole.ADMIN]);
       const ctx = makeContext(UserRole.ADMIN, [UserRole.AGENT, UserRole.ADMIN]);
-      expect(guard.canActivate(ctx as any)).toBe(true);
+      expect(guard.canActivate(ctx)).toBe(true);
     });
 
     it('rejects USER from agent+admin routes', () => {
       setupRoles([UserRole.AGENT, UserRole.ADMIN]);
       const ctx = makeContext(UserRole.USER, [UserRole.AGENT, UserRole.ADMIN]);
-      expect(() => guard.canActivate(ctx as any)).toThrow(ForbiddenException);
+      expect(() => guard.canActivate(ctx)).toThrow(ForbiddenException);
     });
   });
 
@@ -87,7 +88,7 @@ describe('RolesGuard - RBAC enforcement', () => {
     it('allows any authenticated user when no roles are required', () => {
       setupRoles(null);
       const ctx = makeContext(UserRole.USER, null);
-      expect(guard.canActivate(ctx as any)).toBe(true);
+      expect(guard.canActivate(ctx)).toBe(true);
     });
   });
 
@@ -99,8 +100,8 @@ describe('RolesGuard - RBAC enforcement', () => {
         switchToHttp: () => ({ getRequest: () => request }),
         getHandler: () => ({}),
         getClass: () => ({}),
-      };
-      expect(() => guard.canActivate(ctx as any)).toThrow(ForbiddenException);
+      } as unknown as ExecutionContext;
+      expect(() => guard.canActivate(ctx)).toThrow(ForbiddenException);
     });
 
     it('throws ForbiddenException when no user in request', () => {
@@ -109,8 +110,8 @@ describe('RolesGuard - RBAC enforcement', () => {
         switchToHttp: () => ({ getRequest: () => ({}) }),
         getHandler: () => ({}),
         getClass: () => ({}),
-      };
-      expect(() => guard.canActivate(ctx as any)).toThrow(ForbiddenException);
+      } as unknown as ExecutionContext;
+      expect(() => guard.canActivate(ctx)).toThrow(ForbiddenException);
     });
   });
 });
@@ -171,7 +172,7 @@ describe('PropertiesController - RBAC', () => {
       zipCode: '10001',
       price: 100000,
       propertyType: 'House',
-    } as any;
+    } as CreatePropertyDto;
     const result = await controller.create(dto, regularUser);
     expect(result).toEqual({ id: 'p1' });
     expect(service.create).toHaveBeenCalledWith(dto, regularUser.sub);
@@ -186,7 +187,7 @@ describe('PropertiesController - RBAC', () => {
       zipCode: '10001',
       price: 200000,
       propertyType: 'Condo',
-    } as any;
+    } as CreatePropertyDto;
     await controller.create(dto, adminUser);
     expect(service.create).toHaveBeenCalledWith(dto, adminUser.sub);
   });
@@ -209,19 +210,19 @@ describe('AdminController - RBAC (guard integration)', () => {
   it('ADMIN can access admin dashboard', () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue([UserRole.ADMIN]);
     const ctx = makeContext(UserRole.ADMIN, [UserRole.ADMIN]);
-    expect(guard.canActivate(ctx as any)).toBe(true);
+    expect(guard.canActivate(ctx)).toBe(true);
   });
 
   it('USER cannot access admin dashboard', () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue([UserRole.ADMIN]);
     const ctx = makeContext(UserRole.USER, [UserRole.ADMIN]);
-    expect(() => guard.canActivate(ctx as any)).toThrow(ForbiddenException);
+    expect(() => guard.canActivate(ctx)).toThrow(ForbiddenException);
   });
 
   it('AGENT cannot access admin dashboard', () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue([UserRole.ADMIN]);
     const ctx = makeContext(UserRole.AGENT, [UserRole.ADMIN]);
-    expect(() => guard.canActivate(ctx as any)).toThrow(ForbiddenException);
+    expect(() => guard.canActivate(ctx)).toThrow(ForbiddenException);
   });
 });
 
@@ -241,18 +242,18 @@ describe('TransactionsController - RBAC (guard integration)', () => {
   it('AGENT can create transactions', () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue([UserRole.AGENT, UserRole.ADMIN]);
     const ctx = makeContext(UserRole.AGENT, [UserRole.AGENT, UserRole.ADMIN]);
-    expect(guard.canActivate(ctx as any)).toBe(true);
+    expect(guard.canActivate(ctx)).toBe(true);
   });
 
   it('ADMIN can create transactions', () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue([UserRole.AGENT, UserRole.ADMIN]);
     const ctx = makeContext(UserRole.ADMIN, [UserRole.AGENT, UserRole.ADMIN]);
-    expect(guard.canActivate(ctx as any)).toBe(true);
+    expect(guard.canActivate(ctx)).toBe(true);
   });
 
   it('USER cannot create transactions', () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue([UserRole.AGENT, UserRole.ADMIN]);
     const ctx = makeContext(UserRole.USER, [UserRole.AGENT, UserRole.ADMIN]);
-    expect(() => guard.canActivate(ctx as any)).toThrow(ForbiddenException);
+    expect(() => guard.canActivate(ctx)).toThrow(ForbiddenException);
   });
 });

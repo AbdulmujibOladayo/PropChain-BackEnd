@@ -14,7 +14,7 @@ const IMAGE_CACHE_DURATIONS: Record<string, number> = {
 
 @Injectable()
 export class CacheHeadersInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const res = context.switchToHttp().getResponse();
     const req = context.switchToHttp().getRequest();
     const start = Date.now();

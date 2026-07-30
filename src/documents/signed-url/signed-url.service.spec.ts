@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SignedUrlService } from './signed-url.service';
+import { SignedUrlRequest, SignedUrlResponse } from './signed-url-provider.interface';
 
 describe('SignedUrlService', () => {
   let service: SignedUrlService;
@@ -31,9 +32,9 @@ describe('SignedUrlService', () => {
 
   describe('getSignedUrl', () => {
     it('should delegate to the injected provider', async () => {
-      const payload = { operation: 'download' as any, objectKey: 'test.pdf' };
-      mockProvider.getSignedUrl.mockResolvedValue({ url: 'http://signed' } as any);
-
+      const payload = { operation: 'download', objectKey: 'test.pdf' } as SignedUrlRequest;
+      mockProvider.getSignedUrl.mockResolvedValue({ url: 'http://signed' } as SignedUrlResponse);
+      
       const result = await service.getSignedUrl(payload);
 
       expect(mockProvider.getSignedUrl).toHaveBeenCalledWith(payload);

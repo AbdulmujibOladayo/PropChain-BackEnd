@@ -25,7 +25,7 @@ export interface Suggestion {
   text: string;
   type: 'property' | 'location' | 'feature' | 'recent' | 'popular';
   count?: number;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 /** Minimum characters before suggestions are fetched */

@@ -138,7 +138,7 @@ export class BlockchainController {
       },
     },
   })
-  getStatus(): Record<string, any> {
+  getStatus() {
     return this.blockchainService.getStatus();
   }
 

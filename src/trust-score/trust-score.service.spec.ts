@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TrustScoreService } from './trust-score.service';
+import { TrustScoreService, TrustScoreBreakdown } from './trust-score.service';
 import { PrismaService } from '../database/prisma.service';
 
 describe('TrustScoreService', () => {
@@ -54,7 +54,7 @@ describe('TrustScoreService', () => {
     verificationDocument: {
       findFirst: jest.fn(),
     },
-  } as any;
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -174,7 +174,7 @@ describe('TrustScoreService', () => {
       jest.spyOn(service, 'calculateTrustScore').mockResolvedValue({
         userId: 'user-123',
         score: 80,
-        breakdown: {} as any,
+        breakdown: {} as TrustScoreBreakdown,
         lastUpdated: new Date(),
         nextUpdateTime: new Date(),
       });
@@ -222,7 +222,7 @@ describe('TrustScoreService', () => {
       jest.spyOn(service, 'calculateTrustScore').mockResolvedValue({
         userId: 'user-1',
         score: 75,
-        breakdown: {} as any,
+        breakdown: {} as TrustScoreBreakdown,
         lastUpdated: new Date(),
         nextUpdateTime: new Date(),
       });

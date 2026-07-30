@@ -1,8 +1,13 @@
 import { EmailService } from './email.service';
+import { ConfigService } from '@nestjs/config';
+import { PrismaService } from '../database/prisma.service';
+import { TrackingService } from '../tracking/tracking.service';
+import { I18nService } from '../i18n/i18n.service';
+import { Queue } from 'bullmq';
 
 describe('EmailService.handleBounce', () => {
   it('disables email notifications on hard bounce', async () => {
-    const prisma: any = {
+    const prisma = {
       user: {
         findUnique: jest.fn().mockResolvedValue({ id: 'user-1', email: 'test@example.com' }),
         update: jest.fn().mockResolvedValue(undefined),
@@ -16,11 +21,11 @@ describe('EmailService.handleBounce', () => {
     };
 
     const service = new EmailService(
-      { get: jest.fn().mockReturnValue('http://localhost:3000/api') } as any,
-      prisma,
-      { createEmailEngagement: jest.fn() } as any,
-      { add: jest.fn() } as any,
-      { translate: jest.fn().mockReturnValue('test') } as any,
+      { get: jest.fn().mockReturnValue('http://localhost:3000/api') } as unknown as ConfigService,
+      prisma as unknown as PrismaService,
+      { createEmailEngagement: jest.fn() } as unknown as TrackingService,
+      { translate: jest.fn((key) => key) } as unknown as I18nService,
+      { add: jest.fn() } as unknown as Queue,
     );
 
     await service.handleBounce('test@example.com', 'HARD', 'Mailbox disabled', {

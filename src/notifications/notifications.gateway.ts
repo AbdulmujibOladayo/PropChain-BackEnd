@@ -5,9 +5,6 @@ import {
   WebSocketServer,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  SubscribeMessage,
-  ConnectedSocket,
-  MessageBody,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
@@ -56,61 +53,13 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
     }
   }
 
-  @SubscribeMessage('joinProperty')
-  handleJoinProperty(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { propertyId: string },
-  ) {
-    if (data?.propertyId) {
-      client.join(`property:${data.propertyId}`);
-      this.logger.log(`Client ${client.id} joined property room ${data.propertyId}`);
-      return { event: 'joinedProperty', data: { propertyId: data.propertyId } };
-    }
-    return { event: 'error', data: { message: 'propertyId is required' } };
-  }
-
-  @SubscribeMessage('leaveProperty')
-  handleLeaveProperty(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { propertyId: string },
-  ) {
-    if (data?.propertyId) {
-      client.leave(`property:${data.propertyId}`);
-      this.logger.log(`Client ${client.id} left property room ${data.propertyId}`);
-      return { event: 'leftProperty', data: { propertyId: data.propertyId } };
-    }
-  }
-
-  @SubscribeMessage('joinTransaction')
-  handleJoinTransaction(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { transactionId: string },
-  ) {
-    if (data?.transactionId) {
-      client.join(`transaction:${data.transactionId}`);
-      this.logger.log(`Client ${client.id} joined transaction room ${data.transactionId}`);
-      return { event: 'joinedTransaction', data: { transactionId: data.transactionId } };
-    }
-    return { event: 'error', data: { message: 'transactionId is required' } };
-  }
-
-  @SubscribeMessage('leaveTransaction')
-  handleLeaveTransaction(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { transactionId: string },
-  ) {
-    if (data?.transactionId) {
-      client.leave(`transaction:${data.transactionId}`);
-      return { event: 'leftTransaction', data: { transactionId: data.transactionId } };
-    }
-  }
-
-  @SubscribeMessage('joinUser')
-  handleJoinUser(@ConnectedSocket() client: Socket, @MessageBody() data: { userId: string }) {
-    const socketUserId = this.socketUsers.get(client.id);
-    if (socketUserId && socketUserId === data?.userId) {
-      client.join(`user:${data.userId}`);
-      return { event: 'joinedUser', data: { userId: data.userId } };
+  sendToUser(userId: string, event: string, data: unknown): boolean {
+    const sockets = this.userSockets.get(userId);
+    if (sockets && sockets.length > 0) {
+      sockets.forEach((socketId) => {
+        this.server.to(socketId).emit(event, data);
+      });
+      return true;
     }
     return { event: 'error', data: { message: 'Unauthorized to join this user room' } };
   }

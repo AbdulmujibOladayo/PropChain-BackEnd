@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';

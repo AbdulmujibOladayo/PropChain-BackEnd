@@ -27,7 +27,8 @@ describe('SupportTicketsService', () => {
     const result = await service.createTicket('user-1', {
       subject: 'Test', description: 'Desc', priority: 'HIGH',
     } as any);
-    expect(prisma.supportTicket.create).toHaveBeenCalled();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(prisma.supportTicket!.create).toHaveBeenCalled();
     expect(result.id).toBe('ticket-1');
   });
 });

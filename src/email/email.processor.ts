@@ -32,7 +32,8 @@ export class EmailProcessor extends WorkerHost {
         context,
       });
       this.logger.log(`Email sent successfully to ${to}`);
-    } catch (error) {
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
       this.logger.error(`Failed to send email to ${to}: ${error.message}`, error.stack);
       throw error; // BullMQ will handle retries if configured
     }

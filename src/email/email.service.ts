@@ -328,6 +328,7 @@ export class EmailService {
       );
 
       this.logger.log(`📧 Email to ${options.to} queued for subject: ${options.subject}`);
+    } catch (err: unknown) {
       const error = err instanceof Error ? err : new Error(String(err));
       this.logger.error(`❌ Failed to queue email to ${options.to}: ${error.message}`);
       throw error;
